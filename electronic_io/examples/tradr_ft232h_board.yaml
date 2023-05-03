@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Czech Technical University in Prague
+
+board:
+  digital:
+    - name: C0
+      is_readable: True
+      is_writable: True
+    - name: C1
+      is_readable: True
+      is_writable: True
+    - name: C2
+      is_readable: True
+      is_writable: True
+    - name: C3
+      is_readable: True
+      is_writable: True
+    - name: C4
+      is_readable: True
+      is_writable: True
+    - name: C5
+      is_readable: True
+      is_writable: True
+    - name: C6
+      is_readable: True
+      is_writable: True

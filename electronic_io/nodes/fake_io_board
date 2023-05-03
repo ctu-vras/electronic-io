@@ -1,0 +1,129 @@
+#!/usr/bin/env python
+
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Czech Technical University in Prague
+
+import rospy
+
+from electronic_io import IOBoardServer
+from electronic_io_msgs.msg import Readings, IOInfo, DigitalIOInfo, DigitizedAnalogIOInfo, RawAnalogIOInfo, \
+    DigitalReading, DigitizedAnalogReading, RawAnalogReading, DigitalWrite, DigitizedAnalogWrite, RawAnalogWrite
+from electronic_io_msgs.srv import ReadRequest, ReadResponse, WriteRequest, WriteResponse
+
+
+class FakeIOBoard(IOBoardServer):
+    def __init__(self):
+        super(FakeIOBoard, self).__init__("io_board")
+
+    def _create_io_info(self):
+        io_info = IOInfo()
+        self.readings = Readings()
+
+        board_config = rospy.get_param("~board")
+
+        for pin_config in board_config.get("digital", []):
+            info = DigitalIOInfo()
+            reading = DigitalReading()
+            for key in pin_config:
+                if key != "fake_value":
+                    if hasattr(info.pin, key):
+                        setattr(info.pin, key, pin_config[key])
+                    else:
+                        setattr(info, key, pin_config[key])
+            reading.name = info.pin.name
+            reading.value = pin_config.get("fake_value", False)
+            io_info.digital.append(info)
+            self.readings.digital.append(reading)
+
+        for pin_config in board_config.get("digitized_analog", []):
+            info = DigitizedAnalogIOInfo()
+            reading = DigitizedAnalogReading()
+            for key in pin_config:
+                if key != "fake_value":
+                    if hasattr(info.pin, key):
+                        setattr(info.pin, key, pin_config[key])
+                    else:
+                        setattr(info, key, pin_config[key])
+            reading.name = info.pin.name
+            reading.value = pin_config.get("fake_value", 0)
+            io_info.digitized_analog.append(info)
+            self.readings.digitized_analog.append(reading)
+
+        for pin_config in board_config.get("raw_analog", []):
+            info = RawAnalogIOInfo()
+            reading = RawAnalogReading()
+            for key in pin_config:
+                if key != "fake_value":
+                    if hasattr(info.pin, key):
+                        setattr(info.pin, key, pin_config[key])
+                    else:
+                        setattr(info, key, pin_config[key])
+            reading.name = info.pin.name
+            reading.value = pin_config.get("fake_value", 0.0)
+            io_info.raw_analog.append(info)
+            self.readings.raw_analog.append(reading)
+
+        return io_info
+
+    def _handle_read(self, read_req):  # type: (ReadRequest) -> ReadResponse
+        resp = ReadResponse()
+        resp.readings.header.stamp = rospy.Time.now()
+        resp.readings.header.frame_id = "fake"
+
+        for pin_name in read_req.digital_pins:
+            for reading in self.readings.digital:  # type: DigitalReading
+                if reading.name == pin_name:
+                    resp.readings.digital.append(reading)
+                    break
+
+        for pin_name in read_req.digitized_analog_pins:
+            for reading in self.readings.digitized_analog:  # type: DigitizedAnalogReading
+                if reading.name == pin_name:
+                    resp.readings.digitized_analog.append(reading)
+                    break
+
+        for pin_name in read_req.raw_analog_pins:
+            for reading in self.readings.raw_analog:  # type: RawAnalogReading
+                if reading.name == pin_name:
+                    resp.readings.raw_analog.append(reading)
+                    break
+
+        return resp
+
+    def _handle_write(self, write_req):  # type: (WriteRequest) -> WriteResponse
+        for write_pin in write_req.digital:  # type: DigitalWrite
+            for reading in self.readings.digital:  # type: DigitalReading
+                if reading.name == write_pin.name:
+                    reading.value = write_pin.value
+                    break
+
+        for write_pin in write_req.digitized_analog:  # type: DigitizedAnalogWrite
+            for reading in self.readings.digitized_analog:  # type: DigitizedAnalogReading
+                if reading.name == write_pin.name:
+                    reading.value = write_pin.value
+                    break
+
+        for write_pin in write_req.raw_analog:  # type: RawAnalogWrite
+            for reading in self.readings.raw_analog:  # type: RawAnalogReading
+                if reading.name == write_pin.name:
+                    reading.value = write_pin.value
+                    break
+
+        return WriteResponse()
+
+    def run(self):
+        publish_rate = rospy.get_param("~publish_rate", None)
+
+        if publish_rate is None:
+            try:
+                rospy.spin()
+            except rospy.ROSInterruptException:
+                pass
+        else:
+            self.poll_forever(rospy.Rate(float(publish_rate)))
+
+
+if __name__ == '__main__':
+    rospy.init_node("fake_io_board")
+    board = FakeIOBoard()
+    board.run()

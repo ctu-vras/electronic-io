@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>electronic_io_msgs</name>
+  <version>1.0.0</version>
+  <description>Messages for interaction with analog and digital inputs and outputs.</description>
+
+  <author email="peckama2@fel.cvut.cz">Martin Pecka</author>
+  <maintainer email="peckama2@fel.cvut.cz">Martin Pecka</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">https://wiki.ros.org/electronic_io_msgs</url>
+  <url type="repository">https://github.com/ctu-vras/electronic-io</url>
+  <url type="bugtracker">https://github.com/ctu-vras/electronic-io/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>std_msgs</depend>
+
+  <build_depend>message_generation</build_depend>
+  <build_export_depend>message_runtime</build_export_depend>
+  <exec_depend>message_runtime</exec_depend>
+
+  <test_depend condition="$ROS_PYTHON_VERSION == 2">python-catkin-lint</test_depend>
+  <test_depend condition="$ROS_PYTHON_VERSION == 3">python3-catkin-lint</test_depend>
+  <test_depend>roslint</test_depend>
+</package>

@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Czech Technical University in Prague
+
+# Write a (sub)set of I/O pins (ideally synchronously if supported by the hardware).
+
+DigitalWrite[] digital
+# Analog pins that can be accessed through both "raw" and "digitized" interfaces should each only appear in one of the
+# following fields.
+RawAnalogWrite[] raw_analog
+DigitizedAnalogWrite[] digitized_analog
+---
+# If a failure occurs, the service server should throw an exception.

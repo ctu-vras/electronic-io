@@ -1,0 +1,100 @@
+#!/usr/bin/env python
+
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Czech Technical University in Prague
+
+import importlib
+import sys
+
+import rospy
+
+from electronic_io import Device, InputDevice, OutputDevice, IOBoardClient
+from electronic_io_msgs.msg import Readings
+from electronic_io_msgs.srv import ReadRequest
+
+
+class Devices:
+    def __init__(self):
+        io_topic = "io_board"
+
+        self.io_board = IOBoardClient(io_topic)
+
+        self.devices = dict()
+        devices_conf = rospy.get_param("~electronic_io_devices", None)
+        if not isinstance(devices_conf, dict):
+            raise AttributeError("Invalid configuration of electronic_io/devices node. "
+                                 "Parameter ~electronic_io_devices has to be a dictionary.")
+        for device_name in devices_conf:
+            device_conf = devices_conf[device_name]
+            if "type" not in device_conf:
+                rospy.logerr("Invalid configuration of device " + device_name + ". It has to contain 'type' key.")
+                continue
+            device_type = device_conf["type"]
+            if "." not in device_type:
+                rospy.logerr("Invalid type of device " + device_name + ". It has to be of form 'package.Class'.")
+
+            device_module, device_class = device_type.rsplit(".", 1)
+
+            try:
+                module = importlib.import_module(device_module)
+            except Exception as e:
+                rospy.logerr("Could not import module " + device_module + ": " + str(e))
+                continue
+
+            if not getattr(module, device_class):
+                rospy.logerr("Could not find class " + device_class + " in module " + device_module + ".")
+                continue
+
+            clazz = getattr(module, device_class)
+            try:
+                device = clazz(device_name, device_conf, self.io_board)
+            except Exception as e:
+                rospy.logerr("Could not setup device " + device_name + ": " + str(e))
+                continue
+
+            if not isinstance(device, Device):
+                rospy.logerr("Device " + device_name + " does not inherit from electronic_io.Device class.")
+                continue
+
+            self.devices[device_name] = device
+            rospy.loginfo("Successfully added " + device.get_name())
+
+        if len(devices_conf) > 0 and len(self.devices) == 0:
+            rospy.logfatal("Could not load any device, exiting.")
+            sys.exit(1)
+
+        self.io_sub = rospy.Subscriber(io_topic, Readings, self.on_io_readings, queue_size=10)
+
+    def on_io_readings(self, readings):  # type: (Readings) -> None
+        for device in self.devices.values():
+            try:
+                if isinstance(device, InputDevice):
+                    device.update(readings)
+                elif isinstance(device, OutputDevice) and device.has_readback():
+                    device.get_readback_device().update(readings)
+            except Exception as e:
+                rospy.logerr_throttle(1.0, "Error updating " + device.get_name() + ": " + str(e))
+
+    def run(self):
+        poll_rate = rospy.get_param("~poll_rate", None)
+        rate = rospy.Rate(float(poll_rate if poll_rate is not None else 1.0))
+        while not rospy.is_shutdown():
+            if poll_rate is not None:
+                read_req = ReadRequest()
+                for device in self.devices.values():
+                    if isinstance(device, InputDevice):
+                        device.add_read_request(read_req)
+                    elif isinstance(device, OutputDevice) and device.has_readback():
+                        device.get_readback_device().add_read_request(read_req)
+                readings = self.io_board.read(read_req)
+                self.on_io_readings(readings)
+            try:
+                rate.sleep()
+            except rospy.ROSInterruptException:
+                pass
+
+
+if __name__ == '__main__':
+    rospy.init_node("electronic_io_devices")
+    devices = Devices()
+    devices.run()

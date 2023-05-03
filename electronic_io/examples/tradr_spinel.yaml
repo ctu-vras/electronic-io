@@ -1,0 +1,108 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Czech Technical University in Prague
+
+electronic_io_devices:
+
+  power_switch_motors:
+    topic: "power_switch/motors"
+    type: electronic_io.PowerSwitch
+    output_pins:
+      - pin: 'Output7'
+        inverted: False
+    readback_pin:
+      pin: 'Output7'
+      inverted: False
+
+  led_all:
+    topic: "led/all"
+    type: electronic_io.PowerSwitch
+    output_pins:
+      - pin: 'Output8'
+
+  led_front:
+    topic: "led/front"
+    type: electronic_io.DimmableLED
+    pwm:
+      pwm_pin:
+        pin: 'PWM4'
+      enable_pin:
+        pin: 'Output4'
+        inverted: False
+  led_right:
+    topic: "led/right"
+    type: electronic_io.DimmableLED
+    pwm:
+      pwm_pin:
+        pin: 'PWM1'
+      enable_pin:
+        pin: 'Output1'
+        inverted: False
+  led_rear:
+    topic: "led/rear"
+    type: electronic_io.DimmableLED
+    pwm:
+      pwm_pin:
+        pin: 'PWM2'
+      enable_pin:
+        pin: 'Output2'
+        inverted: False
+  led_left:
+    topic: "led/left"
+    type: electronic_io.DimmableLED
+    pwm:
+      pwm_pin:
+        pin: 'PWM3'
+      enable_pin:
+        pin: 'Output3'
+        inverted: False
+  led_top:
+    topic: "led/top"
+    type: electronic_io.DimmableLED
+    pwm:
+      pwm_pin:
+        pin: 'PWM5'
+      enable_pin:
+        pin: 'Output5'
+        inverted: False
+
+  temperature_top_box:
+    topic: "temperature/top_box"
+    type: electronic_io.Thermometer
+    input_pin:
+      pin: 'Temp1'
+  temperature_nuc_left:
+    topic: "temperature/nuc_left"
+    type: electronic_io.Thermometer
+    input_pin:
+      pin: 'Temp2'
+  temperature_nuc_right:
+    topic: "temperature/nuc_right"
+    type: electronic_io.Thermometer
+    input_pin:
+      pin: 'Temp3'
+  temperature_main_pc_left:
+    topic: "temperature/main_pc_left"
+    type: electronic_io.Thermometer
+    input_pin:
+      pin: 'Temp4'
+  temperature_main_pc_right:
+    topic: "temperature/main_pc_right"
+    type: electronic_io.Thermometer
+    input_pin:
+      pin: 'Temp5'
+
+  power_distribution_voltage_24v:
+    topic: "power_distribution/voltage_24v"
+    type: electronic_io.Voltmeter
+    input_pin:
+      pin: 'Voltage1'
+  power_distribution_voltage_12v:
+    topic: "power_distribution/voltage_12v"
+    type: electronic_io.Voltmeter
+    input_pin:
+      pin: 'Voltage2'
+  power_distribution_voltage_5v:
+    topic: "power_distribution/voltage_5v"
+    type: electronic_io.Voltmeter
+    input_pin:
+      pin: 'Voltage3'

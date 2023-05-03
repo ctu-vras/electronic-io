@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>electronic_io</name>
+  <version>1.0.0</version>
+  <description>Convenience library for interaction with analog and digital inputs and outputs.</description>
+
+  <author email="peckama2@fel.cvut.cz">Martin Pecka</author>
+  <maintainer email="peckama2@fel.cvut.cz">Martin Pecka</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">https://wiki.ros.org/electronic_io</url>
+  <url type="repository">https://github.com/ctu-vras/electronic-io</url>
+  <url type="bugtracker">https://github.com/ctu-vras/electronic-io/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_PYTHON_VERSION == 2">python-setuptools</buildtool_depend>
+  <buildtool_depend condition="$ROS_PYTHON_VERSION == 3">python3-setuptools</buildtool_depend>
+
+  <exec_depend>cras_msgs</exec_depend>
+  <exec_depend>electronic_io_msgs</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  
+  <test_depend condition="$ROS_PYTHON_VERSION == 2">python-catkin-lint</test_depend>
+  <test_depend condition="$ROS_PYTHON_VERSION == 3">python3-catkin-lint</test_depend>
+  <test_depend>roslint</test_depend>
+</package>

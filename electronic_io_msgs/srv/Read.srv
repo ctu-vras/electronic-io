@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Czech Technical University in Prague
+
+# Read a (sub)set of I/O pins (ideally synchronously if supported by the hardware).
+
+string[] digital_pins  # Names of digital I/O pins to read.
+string[] raw_analog_pins  # Names of raw analog I/O pins to read.
+string[] digitized_analog_pins  # Names of digitized analog I/O pins to read.
+---
+Readings readings  # The read values.

@@ -1,0 +1,79 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Czech Technical University in Prague
+
+electronic_io_devices:
+
+  power_switch_sw1:
+    topic: "power_switch/sw1"
+    type: electronic_io.PowerSwitch
+    output_pins: 
+      - pin: 'C5'
+        inverted: False
+    readback_pin:
+      pin: 'C5'
+      inverted: False
+  power_switch_motors:
+    topic: "power_switch/motors"
+    type: electronic_io.PowerSwitch
+    output_pins:
+      - pin: 'C6'
+        inverted: False
+    readback_pin:
+      pin: 'C6'
+      inverted: False
+  power_switch_sw3:
+    topic: "power_switch/sw3"
+    type: electronic_io.PowerSwitch
+    output_pins:
+      - pin: 'C4'
+        inverted: False
+    readback_pin:
+      pin: 'C4'
+      inverted: False
+
+  led_front:
+    topic: "led/front"
+    type: electronic_io.DimmableLED
+    discrete_steps:
+      - interval: [0.0, 0.25]
+        readback_value: 0.0
+        pins:
+          - pin: 'C1'
+            value: False
+      - interval: [0.25, 0.75]
+        readback_value: 0.5
+        pins:
+          - pin: 'C1'
+            value: True
+          - pin: 'C0'
+            value: True
+      - interval: [0.75, 1.0]
+        readback_value: 1.0
+        pins:
+          - pin: 'C1'
+            value: True
+          - pin: 'C0'
+            value: False
+  led_side:
+    topic: "led/side"
+    type: electronic_io.DimmableLED
+    discrete_steps:
+      - interval: [0.0, 0.25]
+        readback_value: 0.0
+        pins:
+          - pin: 'C3'
+            value: False
+      - interval: [0.25, 0.75]
+        readback_value: 0.5
+        pins:
+          - pin: 'C3'
+            value: True
+          - pin: 'C2'
+            value: True
+      - interval: [0.75, 1.0]
+        readback_value: 1.0
+        pins:
+          - pin: 'C3'
+            value: True
+          - pin: 'C2'
+            value: False

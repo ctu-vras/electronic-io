@@ -1,0 +1,68 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Czech Technical University in Prague
+
+board:
+  digital:
+    - name: Output1
+      is_readable: True
+      is_writable: True
+    - name: Output2
+      is_readable: True
+      is_writable: True
+    - name: Output3
+      is_readable: True
+      is_writable: True
+    - name: Output4
+      is_readable: True
+      is_writable: True
+    - name: Output5
+      is_readable: True
+      is_writable: True
+    - name: Output6
+      is_readable: True
+      is_writable: True
+    - name: Output7
+      is_readable: True
+      is_writable: True
+    - name: Output8
+      is_writable: True
+  raw_analog:
+    - name: PWM1
+      is_readable: True
+      is_writable: True
+    - name: PWM2
+      is_readable: True
+      is_writable: True
+    - name: PWM3
+      is_readable: True
+      is_writable: True
+    - name: PWM4
+      is_readable: True
+      is_writable: True
+    - name: PWM5
+      is_readable: True
+      is_writable: True
+    - name: Temp1
+      is_readable: True
+      fake_value: 50.1
+    - name: Temp2
+      is_readable: True
+      fake_value: 50.2
+    - name: Temp3
+      is_readable: True
+      fake_value: 50.3
+    - name: Temp4
+      is_readable: True
+      fake_value: 50.4
+    - name: Temp5
+      is_readable: True
+      fake_value: 50.5
+    - name: Voltage1
+      is_readable: True
+      fake_value: 24.1
+    - name: Voltage2
+      is_readable: True
+      fake_value: 12.1
+    - name: Voltage3
+      is_readable: True
+      fake_value: 4.9
