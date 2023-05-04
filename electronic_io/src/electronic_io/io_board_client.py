@@ -13,9 +13,9 @@ from .core import DigitalPin, DigitizedAnalogPin, RawAnalogPin
 class IOBoardClient(object):
     def __init__(self, base_topic):
         self.base_topic = rospy.names.resolve_name(base_topic)  # allow easy remapping of just the base topic
-        self.info_topic = rospy.names.ns_join(base_topic, "io_info")
-        self.read_service = rospy.names.ns_join(base_topic, "read")
-        self.write_service = rospy.names.ns_join(base_topic, "write")
+        self.info_topic = rospy.names.ns_join(self.base_topic, "io_info")
+        self.read_service = rospy.names.ns_join(self.base_topic, "read")
+        self.write_service = rospy.names.ns_join(self.base_topic, "write")
 
         self._io_info = None
         self._read_srv = None
