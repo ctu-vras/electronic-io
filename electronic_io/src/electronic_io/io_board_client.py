@@ -1,17 +1,24 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
+"""Client for communicating with an I/O board."""
+
 import time
 
 from electronic_io_msgs.msg import IOInfo, Readings
 from electronic_io_msgs.srv import Read, ReadRequest, ReadResponse, Write, WriteRequest, WriteResponse
 import rospy
 
-from .core import DigitalPin, DigitizedAnalogPin, RawAnalogPin
+from .pins import DigitalPin, DigitizedAnalogPin, RawAnalogPin
 
 
 class IOBoardClient(object):
+    """Client for communicating with an I/O board."""
+
     def __init__(self, base_topic):
+        """
+        :param str base_topic: Base topic (namespace) used by all the other ROS endpoints.
+        """
         self.base_topic = rospy.names.resolve_name(base_topic)  # allow easy remapping of just the base topic
         self.info_topic = rospy.names.ns_join(self.base_topic, "io_info")
         self.read_service = rospy.names.ns_join(self.base_topic, "read")
@@ -39,6 +46,7 @@ class IOBoardClient(object):
         self._connect_write_srv()
 
     def _connect_read_srv(self):
+        """Wait until the pin reading service is available and then create a :class:`ServiceProxy` for it."""
         waited = False
         if self.read_service is not None:
             while not rospy.is_shutdown():
@@ -53,6 +61,7 @@ class IOBoardClient(object):
             self._read_srv = rospy.ServiceProxy(self.read_service, Read, persistent=True)
 
     def _connect_write_srv(self):
+        """Wait until the pin writing service is available and then create a :class:`ServiceProxy` for it."""
         waited = False
         if self.write_service is not None:
             while not rospy.is_shutdown():
@@ -67,32 +76,41 @@ class IOBoardClient(object):
             self._write_srv = rospy.ServiceProxy(self.write_service, Write, persistent=True)
 
     def _info_cb(self, msg):
-        """
-        
-        :param IOInfo msg: 
-        :return: 
+        """Callback to be called when an `IOInfo` message is received.
+
+        :param IOInfo msg: The pin descriptions.
         """
         self._io_info = msg
 
     def get_io_info(self):
-        """
-        
-        :return:
+        """Get the I/O pins description.
+
+        :return: Pin descriptions.
         :rtype: IOInfo 
         """
         return self._io_info
 
     def can_read(self):
+        """Whether this board has some readable pins.
+
+        :return: Whether the board can be read.
+        :rtype: bool
+        """
         return self._read_srv is not None
 
     def can_write(self):
+        """Whether this board has some writable pins.
+
+        :return: Whether the board can be written to.
+        :rtype bool:
+        """
         return self._write_srv is not None
 
     def read(self, req):
-        """
-        
-        :param ReadRequest req: 
-        :return:
+        """Read values for filling the given request.
+
+        :param ReadRequest req: The request specifying the pins to read.
+        :return: The pin values.
         :rtype: Readings
         """
         if not self.can_read():
@@ -105,9 +123,11 @@ class IOBoardClient(object):
             return self.read(req)
 
     def write(self, req):
-        """
-        
-        :param WriteRequest req: 
+        """Write values from the given request to the pins.
+
+        :param WriteRequest req: The request specifying the pins to write and their values.
+        :return: The pin values.
+        :rtype: Readings
         """
         if not self.can_write():
             raise RuntimeError("Attempted write operation on an IO board that does not support writing")
@@ -118,10 +138,28 @@ class IOBoardClient(object):
             return self.write(req)
 
     def get_digital_pin(self, config):
+        """Get a digital pin corresponding to the given config.
+
+        :param dict config: The pin's config dictionary.
+        :return: The pin.
+        :rtype: DigitalPin
+        """
         return DigitalPin.from_dict(config, self._io_info)
 
     def get_digitized_analog_pin(self, config):
+        """Get a digitized analog pin corresponding to the given config.
+
+        :param dict config: The pin's config dictionary.
+        :return: The pin.
+        :rtype: DigitizedAnalogPin
+        """
         return DigitizedAnalogPin.from_dict(config, self._io_info)
 
     def get_raw_analog_pin(self, config):
+        """Get a raw analog pin corresponding to the given config.
+
+        :param dict config: The pin's config dictionary.
+        :return: The pin.
+        :rtype: RawAnalogPin
+        """
         return RawAnalogPin.from_dict(config, self._io_info)

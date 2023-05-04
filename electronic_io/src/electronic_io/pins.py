@@ -1,66 +1,78 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
+"""API for working with electrical I/O pins."""
+
 from electronic_io_msgs.msg import *
 from electronic_io_msgs.srv import ReadRequest, WriteRequest
 
 
 class IOPin(object):
-    def __init__(self, name, pin_info):
-        """
+    """Generic input-output pin representation."""
 
-        :param str name: 
-        :param pin_info:
+    def __init__(self, name, pin_info):
+        """Initialize the pin with the given parameters.
+
+        :param str name: Name of the pin. This name is used to refer to the pin in all parts of this library.
+        :param pin_info: Metadata about the pin.
         :type pin_info: DigitalIOInfo or DigitizedAnalogIOInfo or RawAnalogIOInfo
         """
         self.name = name
         self.pin_info = pin_info
 
     def get_value(self, readings):
-        """
+        """Read value of the pin from the given set of readings.
 
-        :param Readings readings: 
-        :return: 
-        :rtype: Any
+        :param Readings readings: The readings to parse.
+        :return: The parsed value. If there is no reading for this pin in the given data, None is returned.
+        :rtype: bool or int or float or None
         """
         raise NotImplementedError()
 
     def add_read_request(self, req):
-        """
+        """Modify the passed read request to also query information relevant for this pin.
 
-        :param ReadRequest req: 
+        :param ReadRequest req: The read request to modify.
         """
         raise NotImplementedError()
 
     def add_write_request(self, value, req):
-        """
+        """Modify the passed write request to write the given value to this pin.
 
-        :param Any value: 
-        :param WriteRequest req: 
+        :param value: The value to write.
+        :type value: bool or int or float
+        :param WriteRequest req: The write request to modify.
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    def from_dict(config, io_info):
+        """Create the pin from the given config dictionary and board information.
+
+        :param dict config: The configuration dictionary.
+        :param IOInfo io_info: Info about the I/O pins of a board.
+        :return: The configured pin.
+        :rtype: IOPin
+        :raises AttributeError: When wrong configuration is passed.
         """
         raise NotImplementedError()
 
 
 class DigitalPin(IOPin):
-    def __init__(self, name, pin_info, inverted):
-        """
+    """Digital I/O pin (represents a binary value)."""
 
-        :param str name: 
-        :param DigitalIOInfo pin_info: 
-        :param bool inverted: 
+    def __init__(self, name, pin_info, inverted):
+        """Initialize the pin with the given parameters.
+
+        :param str name: Name of the pin. This name is used to refer to the pin in all parts of this library.
+        :param DigitalIOInfo pin_info: Metadata about the pin.
+        :param bool inverted: Whether readings of this pin should be seamlessly inverted.
         """
         super(DigitalPin, self).__init__(name, pin_info)
         self.inverted = inverted
 
     @staticmethod
-    def from_dict(config, io_info):
-        """
-
-        :param dict config: 
-        :param IOInfo io_info: 
-        :return: 
-        :rtype: DigitalPin
-        """
+    def from_dict(config, io_info):  # type: (dict, IOInfo) -> DigitalPin
         if "pin" not in config:
             raise AttributeError("Expected 'pin' key in config not found. The config was: " + str(config))
         name = config["pin"]
@@ -89,23 +101,18 @@ class DigitalPin(IOPin):
 
 
 class DigitizedAnalogPin(IOPin):
-    def __init__(self, name, pin_info):
-        """
+    """Digitized analog I/O pin (works with integral readings of an A/D converter)."""
 
-        :param str name: 
-        :param DigitizedAnalogIOInfo pin_info: 
+    def __init__(self, name, pin_info):
+        """Initialize the pin with the given parameters.
+
+        :param str name: Name of the pin. This name is used to refer to the pin in all parts of this library.
+        :param DigitizedAnalogIOInfo pin_info: Metadata about the pin.
         """
         super(DigitizedAnalogPin, self).__init__(name, pin_info)
 
     @staticmethod
-    def from_dict(config, io_info):
-        """
-
-        :param dict config: 
-        :param IOInfo io_info: 
-        :return: 
-        :rtype: DigitizedAnalogPin
-        """
+    def from_dict(config, io_info):  # type: (dict, IOInfo) -> DigitizedAnalogPin
         if "pin" not in config:
             raise AttributeError("Expected 'pin' key in config not found. The config was: " + str(config))
         name = config["pin"]
@@ -134,23 +141,18 @@ class DigitizedAnalogPin(IOPin):
 
 
 class RawAnalogPin(IOPin):
-    def __init__(self, name, pin_info):
-        """
+    """Raw analog I/O pin (works directly with float values)."""
 
-        :param str name: 
-        :param RawAnalogIOInfo pin_info: 
+    def __init__(self, name, pin_info):
+        """Initialize the pin with the given parameters.
+
+        :param str name: Name of the pin. This name is used to refer to the pin in all parts of this library.
+        :param RawAnalogIOInfo pin_info: Metadata about the pin.
         """
         super(RawAnalogPin, self).__init__(name, pin_info)
 
     @staticmethod
-    def from_dict(config, io_info):
-        """
-
-        :param dict config: 
-        :param IOInfo io_info: 
-        :return: 
-        :rtype: RawAnalogPin
-        """
+    def from_dict(config, io_info):  # type: (dict, IOInfo) -> RawAnalogPin
         if "pin" not in config:
             raise AttributeError("Expected 'pin' key in config not found. The config was: " + str(config))
         name = config["pin"]

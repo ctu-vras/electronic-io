@@ -1,6 +1,38 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
+"""
+Power Switch (Relay)
+====================
+
+**Device type:** Output device with readback.
+
+**Set output service type:** :std_srvs:`SetBool`.
+
+**Readback messages type:** :cras_msgs:`PowerSwitchStateStamped`.
+
+**Pin requirements:** At least one digital output pin (readback supported).
+
+YAML config
+-----------
+
+::
+
+   topic: 'TOPIC NAME'
+   type: electronic_io.DimmableLED
+   queue_size: 1  # Optional. Readback topic queue size.
+   latch: True  # Optional. Readback topic latching status.
+   frame_id: 'frame'  # Optional. frame_id to be used in the messages; if not set, it is taken from the readings.
+   output_pins:  # One or more output pins.
+     - pin: 'C5'  # Digital pin. Write required, readback supported.
+       inverted: False  # Whether to invert values of the pin.
+   readback_pin:  # Optional readback pin. If not specified, only one output pin is specified and it supports readback,
+                  # the readback is automatically provided.
+     pin: 'C5'  # Digital pin. Readback required.
+     inverted: False  # Whether to invert values of the pin.
+
+"""
+
 import rospy
 from cras_msgs.msg import PowerSwitchStateStamped
 
@@ -8,6 +40,8 @@ from ..device import InputDevice, DigitalOutputDevice
 
 
 class PowerSwitchReadback(InputDevice):
+    """Readback of a power switch. Can also be used standalone without the write part.
+    Publishes :cras_msgs:`PowerSwitchStateStamped` readback messages."""
 
     def __init__(self, name, config, io_board):
         super(PowerSwitchReadback, self).__init__(name, config, io_board, PowerSwitchStateStamped, 1, True)
@@ -39,18 +73,7 @@ class PowerSwitchReadback(InputDevice):
 
 
 class PowerSwitch(DigitalOutputDevice):
-    """
-    Thermometer device.
-    
-    YAML config is: ::
-    
-       input_pin:
-         pin: 'PIN NAME'  # required; name of the pin (has to be a raw analog pin)
-       frame_id: 'frame'  # optional; frame_id to be used in the messages; if not set, it is taken from the readings
-       variance: 1.0  # optional, default 0.0; the reported variance of the measurements; beware this is the variance in
-                      # Kelvins, so if you measure in degrees Fahrenheit, you need to scale the variance accordingly.
-
-    """
+    """Power switch controlled using :std_msgs:`SetBool` service."""
 
     def __init__(self, name, config, io_board):
         super(PowerSwitch, self).__init__(name, config, io_board)

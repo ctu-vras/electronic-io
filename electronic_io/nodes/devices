@@ -3,7 +3,14 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
-import importlib
+"""
+ROS node that reads configuration of I/O devices and the runs them.
+
+Parameters:
+- `~electronic_io_devices` (dict): The config dictionary specifying the devices.
+- `~poll_rate` (float, optional): Rate at which all pins will be read and the device will produce output.
+"""
+
 import sys
 
 import rospy

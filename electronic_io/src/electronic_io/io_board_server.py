@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
+"""Base for implementation of I/O board drivers exposing their pins via the `read`/`write` services or a topic."""
+
 import rospy
 
 from electronic_io_msgs.msg import Readings, IOInfo, DigitalIOInfo, DigitizedAnalogIOInfo, RawAnalogIOInfo
@@ -8,7 +10,12 @@ from electronic_io_msgs.srv import Read, ReadRequest, ReadResponse, Write, Write
 
 
 class IOBoardServer(object):
+    """Base for implementing I/O board driver."""
+
     def __init__(self, base_topic):
+        """
+        :param str base_topic: The base topic to use for publishing messages. 
+        """
         self.base_topic = rospy.names.resolve_name(base_topic)
         self.info_topic = rospy.names.ns_join(base_topic, "io_info")
         self.read_service = rospy.names.ns_join(base_topic, "read")
@@ -34,6 +41,7 @@ class IOBoardServer(object):
         self._info_pub.publish(self.io_info)
 
     def _report_pins(self):
+        """Print a summary of the provided pins to console."""
         def pin_rw(pin):
             rw = []
             if pin.is_readable:
@@ -53,42 +61,48 @@ class IOBoardServer(object):
         rospy.loginfo("- Raw analog: " + pin_list(self.io_info.raw_analog))
 
     def _setup_publishers(self):
+        """Setup all publishers."""
         self._readings_pub = rospy.Publisher(self.base_topic, Readings, queue_size=1, latch=True)
         self._info_pub = rospy.Publisher(self.info_topic, IOInfo, queue_size=1, latch=True)
         self._read_srv = rospy.Service(self.read_service, Read, self._handle_read)
         self._write_srv = rospy.Service(self.write_service, Write, self._handle_write)
 
     def _create_io_info(self):
-        """
-        
-        :return:
-        :rtype: IOInfo 
+        """Create the description of pins on the board.
+
+        :return: The pin description.
+        :rtype: IOInfo
         """
         raise NotImplementedError()
 
     def _handle_read(self, read_req):
-        """
-        
-        :param ReadRequest read_req: 
-        :return: 
+        """Read pins from the request and report their values in the response.
+
+        :param ReadRequest read_req: The request specifying what pins to read.
+        :return: Response with the read values.
         :rtype: ReadResponse
         """
         raise NotImplementedError()
 
     def _handle_write(self, write_req):
-        """
-        
-        :param WriteRequest write_req: 
-        :return: 
+        """Set values of pins according to the request.
+
+        :param WriteRequest write_req: Request specifying the values to set.
+        :return: Empty response.
         :rtype: WriteResponse
         """
         raise NotImplementedError()
 
     def poll_once(self):
+        """Poll values of all pins and publish - only once."""
         resp = self._handle_read(self._full_poll_req)
         self._readings_pub.publish(resp.readings)
 
     def poll_forever(self, rate):
+        """Poll and publish values indefinitely.
+
+        :param Rate rate: The polling rate.
+        """
         while not rospy.is_shutdown():
             try:
                 self.poll_once()

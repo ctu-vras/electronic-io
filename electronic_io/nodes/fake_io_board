@@ -3,6 +3,14 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
+"""
+A virtual I/O board that can be used for faking a real one e.g. in tests.
+
+Parameters:
+- `board` (dict): A config dictionary representing all pins on the board.
+- `poll_rate` (float, optional): Rate at which all pins will be read and the device will produce output.
+"""
+
 import rospy
 
 from electronic_io import IOBoardServer
@@ -12,6 +20,8 @@ from electronic_io_msgs.srv import ReadRequest, ReadResponse, WriteRequest, Writ
 
 
 class FakeIOBoard(IOBoardServer):
+    """A virtual I/O board that can be used for faking a real one e.g. in tests."""
+
     def __init__(self):
         super(FakeIOBoard, self).__init__("io_board")
 
@@ -112,15 +122,15 @@ class FakeIOBoard(IOBoardServer):
         return WriteResponse()
 
     def run(self):
-        publish_rate = rospy.get_param("~publish_rate", None)
+        poll_rate = rospy.get_param("~poll_rate", None)
 
-        if publish_rate is None:
+        if poll_rate is None:
             try:
                 rospy.spin()
             except rospy.ROSInterruptException:
                 pass
         else:
-            self.poll_forever(rospy.Rate(float(publish_rate)))
+            self.poll_forever(rospy.Rate(float(poll_rate)))
 
 
 if __name__ == '__main__':

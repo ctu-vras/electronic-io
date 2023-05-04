@@ -1,25 +1,35 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
-import rospy
+"""
+Group of Output Devices
+=======================
 
-from cras_msgs.msg import VoltageStamped
+**Device type:** Output device without readback.
+
+**Set output service type:** Same as the service of the grouped devices.
+
+**Pin requirements:** Does not use any pins itself.
+
+This is a meta-device that offers easy synchronized control of multiple output devices of the same type.
+
+YAML config
+-----------
+
+::
+
+   topic: 'TOPIC NAME'
+   type: electronic_io.OutputGroup
+   devices:  # List of grouped devices. All devices must be defined in the same config and must have the same type.
+     - device1  # Name of the device.
+
+"""
 
 from ..device import OutputDevice, MetaDevice
 
 
 class OutputGroup(OutputDevice, MetaDevice):
-    """
-    A group of output devices of the same type that can all be controlled simultaneously using a single command.
-    
-    YAML config is: ::
-    
-       input_pin:
-         pin: 'PIN NAME'  # required; name of the pin (has to be a raw analog pin)
-       frame_id: 'frame'  # optional; frame_id to be used in the messages; if not set, it is taken from the readings
-       variance: 1.0  # optional, default 0.0; the reported variance of the measurements (in Volt^2).
-
-    """
+    """A group of output devices"""
 
     def __init__(self, name, config, io_board, devices):
         MetaDevice.__init__(self, name, config, io_board, devices)
@@ -45,6 +55,7 @@ class OutputGroup(OutputDevice, MetaDevice):
 
     def _add_write_request(self, value, write_req):
         for device in self._devices.values():
+            # noinspection PyProtectedMember
             device._add_write_request(value, write_req)
 
     def set_value_cb(self, request):
