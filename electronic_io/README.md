@@ -17,3 +17,7 @@ These also specify the two ROS nodes that are expected to be running: a board no
 node (handling the devices).
 
 See the [`examples` folder](examples) for inspiration how the nodes and configs can be used and configured.
+
+## Adding a new device type
+
+TODO(peckama2): Write
