@@ -13,12 +13,6 @@ electronic_io_devices:
       pin: 'Output7'
       inverted: False
 
-  led_all:
-    topic: "led/all"
-    type: electronic_io.PowerSwitch
-    output_pins:
-      - pin: 'Output8'
-
   led_front:
     topic: "led/front"
     type: electronic_io.DimmableLED
@@ -64,6 +58,31 @@ electronic_io_devices:
       enable_pin:
         pin: 'Output5'
         inverted: False
+  
+  led_onoff_all:
+    topic: "led/onoff_all"
+    type: electronic_io.PowerSwitch
+    output_pins:
+      - pin: 'Output8'
+  
+  led_all:
+    topic: "led/all"
+    type: electronic_io.OutputGroup
+    devices:
+      - led_front
+      - led_rear
+      - led_left
+      - led_right
+      - led_top
+  
+  led_all_except_top:
+    topic: "led/all_except_top"
+    type: electronic_io.OutputGroup
+    devices:
+      - led_front
+      - led_rear
+      - led_left
+      - led_right
 
   temperature_top_box:
     topic: "temperature/top_box"

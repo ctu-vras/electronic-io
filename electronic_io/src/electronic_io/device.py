@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
+import importlib
 import rospy
-from electronic_io_msgs.msg import IOInfo, Readings, DigitalReading, DigitizedAnalogReading, RawAnalogReading
-from electronic_io_msgs.srv import ReadRequest, ReadResponse, WriteRequest
+from electronic_io_msgs.msg import Readings
+from electronic_io_msgs.srv import ReadRequest, WriteRequest
 from std_srvs.srv import SetBool, SetBoolResponse, Trigger, TriggerResponse
 
 from .io_board_client import IOBoardClient
@@ -18,11 +19,15 @@ class Device(object):
         :param IOBoardClient io_board: 
         """
         self.name = name
-        if "topic" not in config:
-            raise AttributeError("Key 'topic' is missing for device " + name + ".")
-        self.topic = config["topic"]
-        self.config = config
         self.io_board = io_board
+
+        if not isinstance(config, dict):
+            raise AttributeError("Configuration of %s has to be a dictionary." % (self.get_name(),))
+        self.config = config
+
+        if "topic" not in config:
+            raise AttributeError("Key 'topic' is missing for " + self.get_name() + ".")
+        self.topic = config["topic"]
 
     def get_name(self):
         """
@@ -101,6 +106,7 @@ class OutputDevice(Device):
         if not io_board.can_write():
             raise RuntimeError("Tried to create output device on a non-writable IO board.")
 
+        self.service_type = service_type
         self._readback_device = None
         self._set_srv = rospy.Service(self.topic + "/set", service_type, self.set_value_cb)
 
@@ -172,3 +178,84 @@ class DigitalOutputDevice(OutputDevice):
         resp = SetBoolResponse()
         resp.success = self.set_value(request.data)
         return resp
+
+
+class MetaDevice(object):
+    """Tagging class denoting devices that work on other devices, i.e. need to be loaded last."""
+
+    def __init__(self, name, config, io_board, devices):
+        if "devices" not in config or not isinstance(config["devices"], list):
+            raise AttributeError("Group %s has to contain key 'devices' that is a list." % (name,))
+
+        if len(config["devices"]) == 0:
+            raise AttributeError("List 'devices' of group %s cannot be empty." % (name,))
+
+        self._devices = {}
+        for device_name in config["devices"]:
+            if device_name not in devices:
+                raise AttributeError("Sub-device %s referenced from group %s does not exist." % (
+                    device_name, name))
+            self._devices[device_name] = devices[device_name]
+
+
+def load_devices(devices_conf, io_board):
+    meta_device_args = []
+    devices = {}
+    for device_name in devices_conf:
+        device_conf = devices_conf[device_name]
+        if "type" not in device_conf:
+            rospy.logerr("Invalid configuration of device " + device_name + ". It has to contain 'type' key.")
+            continue
+        device_type = device_conf["type"]
+        if "." not in device_type:
+            rospy.logerr("Invalid type of device " + device_name + ". It has to be of form 'package.Class'.")
+
+        device_module, device_class = device_type.rsplit(".", 1)
+
+        try:
+            module = importlib.import_module(device_module)
+        except Exception as e:
+            rospy.logerr("Could not import module " + device_module + ": " + str(e))
+            continue
+
+        if not getattr(module, device_class):
+            rospy.logerr("Could not find class " + device_class + " in module " + device_module + ".")
+            continue
+
+        clazz = getattr(module, device_class)
+
+        if issubclass(clazz, MetaDevice):
+            meta_device_args.append([clazz, device_name, device_conf])
+            continue
+
+        try:
+            device = clazz(device_name, device_conf, io_board)
+        except Exception as e:
+            rospy.logerr("Could not setup device " + device_name + ": " + str(e))
+            continue
+
+        if not isinstance(device, Device):
+            rospy.logerr("Device " + device_name + " does not inherit from electronic_io.Device class.")
+            continue
+
+        devices[device_name] = device
+        rospy.loginfo("Successfully added " + device.get_name())
+
+    # Delayed loading of meta devices after all direct devices have finished loading
+    for clazz, device_name, device_conf in meta_device_args:
+        try:
+            device = clazz(device_name, device_conf, io_board, devices)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            rospy.logerr("Could not setup device " + device_name + ": " + str(e))
+            continue
+
+        if not isinstance(device, Device):
+            rospy.logerr("Device " + device_name + " does not inherit from electronic_io.Device class.")
+            continue
+
+        devices[device_name] = device
+        rospy.loginfo("Successfully added " + device.get_name())
+
+    return devices

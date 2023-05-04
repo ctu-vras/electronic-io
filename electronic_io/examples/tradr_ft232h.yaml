@@ -77,3 +77,9 @@ electronic_io_devices:
             value: True
           - pin: 'C2'
             value: False
+  led_all:
+    topic: "led/all"
+    type: electronic_io.OutputGroup
+    devices:
+      - led_front
+      - led_side
