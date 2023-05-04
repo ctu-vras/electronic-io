@@ -15,3 +15,5 @@ The two basic concepts in this package are:
 
 These also specify the two ROS nodes that are expected to be running: a board node (exposing the pins), and a devices
 node (handling the devices).
+
+See the [`examples` folder](examples) for inspiration how the nodes and configs can be used and configured.

@@ -1,0 +1,17 @@
+<!--
+SPDX-License-Identifier: BSD-3-Clause
+SPDX-FileCopyrightText: Czech Technical University in Prague
+
+Example launch file using the fake virtual I/O board.
+-->
+
+<launch>
+    <node name="io_board" pkg="electronic_io" type="fake_io_board" clear_params="true">
+        <rosparam command="load" file="$(dirname)/tradr_spinel_board.yaml" />
+    </node>
+    
+    <node name="devices" pkg="electronic_io" type="devices" clear_params="true">
+        <rosparam command="load" file="$(dirname)/tradr_spinel.yaml" />
+        <param name="poll_rate" value="1.0" />
+    </node>
+</launch>
