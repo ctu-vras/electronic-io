@@ -39,14 +39,16 @@ class Device(object):
 
 
 class InputDevice(Device):
-    def __init__(self, name, config, io_board, topic_type, queue_size, latch, initial_value=None):
+    def __init__(self, name, config, io_board, topic_type, queue_size=1, latch=True, initial_value=None):
         super(InputDevice, self).__init__(name, config, io_board)
 
         if not io_board.can_read():
             raise RuntimeError("Tried to create input device on a non-readable IO board.")
 
         self._last_value = initial_value
-        self._pub = rospy.Publisher(self.topic, topic_type, queue_size=queue_size, latch=latch)
+        self._pub = rospy.Publisher(self.topic, topic_type,
+                                    queue_size=config.get("queue_size", queue_size),
+                                    latch=config.get("latch", latch))
 
     def add_read_request(self, req):
         """
