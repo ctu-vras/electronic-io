@@ -12,52 +12,59 @@ from .core import DigitalPin, DigitizedAnalogPin, RawAnalogPin
 
 class IOBoardClient(object):
     def __init__(self, base_topic):
-        base_topic = rospy.names.resolve_name(base_topic)  # allow easy remapping of just the base topic
-        info_topic = rospy.names.ns_join(base_topic, "io_info")
-        read_service = rospy.names.ns_join(base_topic, "read")
-        write_service = rospy.names.ns_join(base_topic, "write")
+        self.base_topic = rospy.names.resolve_name(base_topic)  # allow easy remapping of just the base topic
+        self.info_topic = rospy.names.ns_join(base_topic, "io_info")
+        self.read_service = rospy.names.ns_join(base_topic, "read")
+        self.write_service = rospy.names.ns_join(base_topic, "write")
 
         self._io_info = None
         self._read_srv = None
         self._write_srv = None
 
-        self._info_sub = rospy.Subscriber(info_topic, IOInfo, self._info_cb, queue_size=1)
+        self._info_sub = rospy.Subscriber(self.info_topic, IOInfo, self._info_cb, queue_size=1)
         waited = False
         while not rospy.is_shutdown():
             time.sleep(0.1)
             if self._io_info is not None:
                 if waited:
-                    rospy.loginfo("IO board info message received on topic " + rospy.names.resolve_name(info_topic))
+                    rospy.loginfo(
+                        "IO board info message received on topic " + rospy.names.resolve_name(self.info_topic))
                 break
             waited = True
             rospy.logwarn_throttle(1.0, "Waiting for IO board info message on topic %s." % (
-                rospy.names.resolve_name(info_topic),))
+                rospy.names.resolve_name(self.info_topic),))
 
+        self._connect_read_srv()
+
+        self._connect_write_srv()
+
+    def _connect_read_srv(self):
         waited = False
-        if read_service is not None:
+        if self.read_service is not None:
             while not rospy.is_shutdown():
                 try:
-                    rospy.wait_for_service(read_service, rospy.Duration(1.0))
+                    rospy.wait_for_service(self.read_service, rospy.Duration(1.0))
                     if waited:
-                        rospy.loginfo("Service %s ready." % (rospy.names.resolve_name(read_service),))
+                        rospy.loginfo("Service %s ready." % (rospy.names.resolve_name(self.read_service),))
                     break
                 except rospy.ROSException:
                     waited = True
-                    rospy.logwarn("Waiting for service " + rospy.names.resolve_name(read_service))
-            self._read_srv = rospy.ServiceProxy(read_service, Read, persistent=True)
+                    rospy.logwarn("Waiting for service " + rospy.names.resolve_name(self.read_service))
+            self._read_srv = rospy.ServiceProxy(self.read_service, Read, persistent=True)
 
+    def _connect_write_srv(self):
         waited = False
-        if write_service is not None:
+        if self.write_service is not None:
             while not rospy.is_shutdown():
                 try:
-                    rospy.wait_for_service(write_service, rospy.Duration(1.0))
+                    rospy.wait_for_service(self.write_service, rospy.Duration(1.0))
                     if waited:
-                        rospy.loginfo("Service %s ready." % (rospy.names.resolve_name(write_service),))
+                        rospy.loginfo("Service %s ready." % (rospy.names.resolve_name(self.write_service),))
                     break
                 except rospy.ROSException:
                     waited = True
-                    rospy.logwarn("Waiting for service " + rospy.names.resolve_name(write_service))
-            self._write_srv = rospy.ServiceProxy(write_service, Write, persistent=True)
+                    rospy.logwarn("Waiting for service " + rospy.names.resolve_name(self.write_service))
+            self._write_srv = rospy.ServiceProxy(self.write_service, Write, persistent=True)
 
     def _info_cb(self, msg):
         """
@@ -90,8 +97,12 @@ class IOBoardClient(object):
         """
         if not self.can_read():
             raise RuntimeError("Attempted read operation on an IO board that does not support reading")
-        resp = self._read_srv(req)  # type: ReadResponse
-        return resp.readings
+        try:
+            resp = self._read_srv(req)  # type: ReadResponse
+            return resp.readings
+        except rospy.TransportException:
+            self._connect_read_srv()
+            return self.read(req)
 
     def write(self, req):
         """
@@ -100,7 +111,11 @@ class IOBoardClient(object):
         """
         if not self.can_write():
             raise RuntimeError("Attempted write operation on an IO board that does not support writing")
-        self._write_srv(req)
+        try:
+            self._write_srv(req)
+        except rospy.TransportException:
+            self._connect_write_srv()
+            return self.write(req)
 
     def get_digital_pin(self, config):
         return DigitalPin.from_dict(config, self._io_info)
