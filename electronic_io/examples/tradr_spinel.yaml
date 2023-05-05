@@ -9,7 +9,7 @@ electronic_io_devices:
     output_pins:
       - pin: 'Output7'
         inverted: False
-    readback_pin:
+    readback_pin:  # Not actually needed. When there is only one output pin and it is readable, readback is automatically set
       pin: 'Output7'
       inverted: False
 

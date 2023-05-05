@@ -34,6 +34,7 @@
     <rosdoc config="rosdoc.yaml"/>
     <!-- Each provided device should have this kind of entry in its corresponding package.xml. -->
     <electronic_io device="electronic_io.AmpereMeter" />
+    <electronic_io device="electronic_io.Battery" />
     <electronic_io device="electronic_io.DimmableLED" />
     <electronic_io device="electronic_io.OutputGroup" />
     <electronic_io device="electronic_io.PowerSwitch" />

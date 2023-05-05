@@ -11,6 +11,14 @@ Ampere Meter
    :undoc-members:
    :show-inheritance:
 
+Battery
+-------
+
+.. automodule:: electronic_io.devices.battery
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Dimmable LED
 ------------
 

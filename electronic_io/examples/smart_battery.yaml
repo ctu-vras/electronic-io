@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Czech Technical University in Prague
+
+electronic_io_devices:
+
+  voltage_cell_1:
+    topic: "battery/cell_voltage/cell_1"
+    type: electronic_io.Voltmeter
+    input_pin:
+      pin: 'Voltage1'
+  voltage_cell_2:
+    topic: "battery/cell_voltage/cell_2"
+    type: electronic_io.Voltmeter
+    input_pin:
+      pin: 'Voltage2'
+  voltage_cell_3:
+    topic: "battery/cell_voltage/cell_3"
+    type: electronic_io.Voltmeter
+    input_pin:
+      pin: 'Voltage3'
+  
+  battery:
+    topic: "battery"
+    type: electronic_io.Battery
+    cell_voltmeters:
+      - voltage_cell_1
+      - voltage_cell_2
+      - voltage_cell_3
+    power_supply_technology: POWER_SUPPLY_TECHNOLOGY_LIPO
+    design_capacity: 10.0
+    present_pin:
+      pin: 'Input7'

@@ -18,6 +18,42 @@ node (handling the devices).
 
 See the [`examples` folder](examples) for inspiration how the nodes and configs can be used and configured.
 
+Configuration of the devices is pretty easy. To add a relay that can power on/off the motors, configure it as simply as:
+
+```yaml
+power_switch_motors:
+  topic: "power_switch/motors"
+  type: electronic_io.PowerSwitch
+  output_pins:
+    - pin: 'Output7'
+      inverted: False
+```
+
+This configuration provides topic `power_switch/motors` with the state of the switch, and services
+`power_switch/motors/set` and `power_switch/motors/toggle` that can change the state of the relay.
+
+The only thing that needs to be coded is the I/O board driver that can actually read and write to pin `Output7`.
+
+## Devices available in this package
+
+- Ampere Meter (type `electronic_io.AmpereMeter`)
+- Battery (type `electronic_io.Battery`)
+- Dimmable LED (type `electronic_io.DimmableLED`)
+- Output Group (type `electronic_io.OutputGroup`)
+- Power Switch (type `electronic_io.PowerSwitch`)
+- Thermometer (type `electronic_io.Thermometer`)
+- Voltmeter (type `electronic_io.Voltmeter`)
+
 ## Adding a new device type
 
-TODO(peckama2): Write
+These steps are generally required when you want to specify a new device type (inside or outside this package):
+
+- Add the class that implements the device to an installed Python module, i.e. you need to have `catkin_python_setup()`
+  in CMakeLists.txt, a setup.py file and the device's package has to be installed.
+- Add the following to package.xml `<export>` section: `<electronic_io device="my_package.MyDevice" />`.
+
+Specifically when adding a device to this package, do not forget to:
+
+- Add it to `src/electronic_io/__init__.py`.
+- Add it to this readme.
+- Add it to `doc/devices.rst` so that it gets documented.
