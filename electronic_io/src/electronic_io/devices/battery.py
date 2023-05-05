@@ -9,8 +9,9 @@ Battery
 
 **Message type:** :sensor_msgs:`BatteryState`.
 
-**Pin requirements:** This is a composite device working on other devices and not pins directly.
-                      One or more Voltmeter devices. Optional Ampere meter device.
+**Pin requirements:** This is a composite device working on other devices (one or more Voltmeter devices; an optional
+                      Ampere meter device). It can also read a raw analog pin with battery percentage and a digital pin
+                      telling whether the battery is present.
 
 YAML config
 -----------
@@ -28,13 +29,13 @@ YAML config
    cell_voltmeters:  # Optional. Measurements of individual cells.
      - voltmeter_cell1  # Voltmeter device.
    ampere_meter: ampere_meter_1  # Optional. AmpereMeter device.
-   percentage_pin:  # Optional. Raw analog pin with percentage in 0.0 - 1.0.
+   percentage_pin:  # Optional. Raw analog pin with percentage in 0.0 - 1.0 or 0.0 - 100.0.
      pin: percentage_1
    present_pin:  # Optional. Digital pin. Tells whether the battery is present.
      pin: input_1
 
 """
-
+import rospy
 from sensor_msgs.msg import BatteryState
 
 from .ampere_meter import AmpereMeter
@@ -110,6 +111,9 @@ class Battery(InputDevice, MetaDevice):
         self._percentage_pin = None
         if "percentage_pin" in config:
             self._percentage_pin = io_board.get_raw_analog_pin(config["percentage_pin"])
+            if self._percentage_pin.pin_info.unit not in ("", "%"):
+                rospy.logwarn("percentage_pin in %s does not report its values in %% unit." % (self.get_name(),))
+            self._is_percentage_max_100 = self._percentage_pin.pin_info.max_value == 100.0
 
         self._present_pin = None
         if "present_pin" in config:
@@ -147,6 +151,10 @@ class Battery(InputDevice, MetaDevice):
 
         if self._percentage_pin is not None:
             percentage = self._percentage_pin.get_value(readings)
+            if percentage > 1.0:
+                self._is_percentage_max_100 = True
+            if self._is_percentage_max_100:
+                percentage /= 100.0
 
         if self._present_pin is not None:
             present = self._present_pin.get_value(readings)
