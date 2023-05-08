@@ -16,7 +16,7 @@ YAML config
 
 ::
 
-   topic: 'TOPIC NAME'
+   topic: 'TOPIC NAME'  # Topic for the measurements. Set to empty string to disable topic publication.
    type: electronic_io.Voltmeter
    queue_size: 1  # Optional. Topic queue size.
    latch: True  # Optional. Topic latching status.

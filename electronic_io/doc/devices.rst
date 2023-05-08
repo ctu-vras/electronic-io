@@ -1,5 +1,5 @@
-electronic\_io.devices
-======================
+Devices
+=======
 
 More devices can be seamlessly added in other packages.
 

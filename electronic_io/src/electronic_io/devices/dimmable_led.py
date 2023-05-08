@@ -21,7 +21,7 @@ YAML config
 
 ::
 
-   topic: 'TOPIC NAME'
+   topic: 'TOPIC NAME'  # Base topic for readback and the services. Set to empty string to disable topics and services.
    type: electronic_io.DimmableLED
    queue_size: 1  # Optional. Readback topic queue size.
    latch: True  # Optional. Readback topic latching status.

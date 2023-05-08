@@ -28,7 +28,7 @@ class Device(object):
         """Base class for all devices. They must extend it.
 
         :param str name: Name of the device. The name has to be unique.
-        :param dict config: Configuration of the device as a dictionary.
+        :param dict config: Configuration of the device as a dictionary. Key 'topic' is required, but can be empty.
         :param IOBoardClient io_board: The I/O board on which the device will be controlling pins.
         :raises AttributeError: If invalid config is provided.
         """
@@ -71,9 +71,12 @@ class InputDevice(Device):
             raise RuntimeError("Tried to create input device on a non-readable IO board.")
 
         self._last_value = initial_value
-        self._pub = rospy.Publisher(self.topic, topic_type,
-                                    queue_size=config.get("queue_size", queue_size),
-                                    latch=config.get("latch", latch))
+
+        self._pub = None
+        if self.topic:
+            self._pub = rospy.Publisher(self.topic, topic_type,
+                                        queue_size=config.get("queue_size", queue_size),
+                                        latch=config.get("latch", latch))
 
     def add_read_request(self, req):
         """Modify the passed read request to collect all information needed by this device.
@@ -124,6 +127,8 @@ class InputDevice(Device):
 
         :param Readings readings: Values of pins.
         """
+        if self._pub is None:
+            return
         value = self.get_value(readings)
         if value is not None:
             self._last_value = value
@@ -149,7 +154,9 @@ class OutputDevice(Device):
 
         self.service_type = service_type
         self._readback_device = None
-        self._set_srv = rospy.Service(self.topic + "/set", service_type, self.set_value_cb)
+
+        if self.topic:
+            self._set_srv = rospy.Service(self.topic + "/set", service_type, self.set_value_cb)
 
     def _add_write_request(self, value, request):
         """Modify the passed write request to set pin values corresponding to the given value.
@@ -220,7 +227,8 @@ class DigitalOutputDevice(OutputDevice):
 
     def set_readback_device(self, device):
         super(DigitalOutputDevice, self).set_readback_device(device)
-        self._toggle_srv = rospy.Service(self.topic + "/toggle", Trigger, self.toggle)
+        if self.topic:
+            self._toggle_srv = rospy.Service(self.topic + "/toggle", Trigger, self.toggle)
 
     def toggle(self, _request):
         if self._readback_device is None:

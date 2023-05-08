@@ -18,7 +18,7 @@ YAML config
 
 ::
 
-   topic: 'TOPIC NAME'
+   topic: 'TOPIC NAME'  # Base topic for readback and the services. Set to empty string to disable topics and services.
    type: electronic_io.OutputGroup
    devices:  # List of grouped devices. All devices must be defined in the same config and must have the same type.
      - device1  # Name of the device.
