@@ -7,6 +7,7 @@ catkin_python_setup()
 
 catkin_package()
 
+#catkin_lint: ignore uninstalled_script
 catkin_install_python(PROGRAMS
   nodes/devices
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
@@ -30,6 +31,26 @@ if (CATKIN_ENABLE_TESTING)
   if(DEFINED ENV{ROS_ROOT} AND EXISTS "${ROS_HOME}/rosdep/sources.cache")
     roslint_custom(catkin_lint "-W2" .)
   endif()
+
+  set(ROSLINT_PYTHON_OPTS "--max-line-length=120")
+  roslint_python(
+    nodes/devices
+    nodes/fake_io_board
+    src/${PROJECT_NAME}/__init__.py
+    src/${PROJECT_NAME}/device.py
+    src/${PROJECT_NAME}/io_board_client.py
+    src/${PROJECT_NAME}/io_board_server.py
+    src/${PROJECT_NAME}/pins.py
+    src/${PROJECT_NAME}/devices/ampere_meter.py
+    src/${PROJECT_NAME}/devices/battery.py
+    src/${PROJECT_NAME}/devices/dimmable_led.py
+    src/${PROJECT_NAME}/devices/output_group.py
+    src/${PROJECT_NAME}/devices/power_switch.py
+    src/${PROJECT_NAME}/devices/thermometer.py
+    src/${PROJECT_NAME}/devices/voltmeter.py
+    src/${PROJECT_NAME}/virtual_pins/digital_pin_combo.py
+    src/${PROJECT_NAME}/virtual_pins/linear_adc_pin.py
+  )
 
   roslint_add_test()
 endif()

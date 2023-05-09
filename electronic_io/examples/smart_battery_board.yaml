@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# SPDX-FileCopyrightText: Czech Technical University in Prague
+
+board:
+  digital:
+    - name: Input7
+      is_readable: True
+      fake_value: True
+  digitized_analog:
+    - name: I1
+      is_readable: True
+      fake_value: 2048
+    - name: I2
+      is_readable: True
+      fake_value: 10
+    - name: I3
+      is_readable: True
+      fake_value: 4000
+    

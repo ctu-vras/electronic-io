@@ -1,6 +1,35 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
+virtual_pins:
+  voltage_1:  # Voltage sensor which measures -12 to +12 V with 12 bits of precision
+    name: "Voltage1"
+    type: electronic_io.LinearADCPin
+    adc_pin:
+      pin: 'I1'
+    unit: 'V'
+    linear_coeff: 0.005859375  # 24 / 2^12
+    constant_coeff: -12.0
+    is_readable: True  # not needed, will be automatically relayed from the digitized pin
+    is_writable: False  # not needed, will be automatically relayed from the digitized pin
+    can_persist: False  # not needed, will be automatically relayed from the digitized pin
+  voltage_2:
+    name: "Voltage2"
+    type: electronic_io.LinearADCPin
+    adc_pin:
+      pin: 'I2'
+    unit: 'V'
+    linear_coeff: 0.005859375  # 24 / 2^12
+    constant_coeff: -12.0
+  voltage_3:
+    name: "Voltage3"
+    type: electronic_io.LinearADCPin
+    adc_pin:
+      pin: 'I3'
+    unit: 'V'
+    linear_coeff: 0.005859375  # 24 / 2^12
+    constant_coeff: -12.0
+
 electronic_io_devices:
 
   voltage_cell_1:

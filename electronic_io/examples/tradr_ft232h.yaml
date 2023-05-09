@@ -1,6 +1,36 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
+virtual_pins:
+  front_led_pin:  # 2 digital pins whose combined value outputs a PWM percentage
+    name: "FrontLed"
+    type: electronic_io.DigitalPinCombo
+    pins:
+      - pin: 'C0'
+      - pin: 'C1'
+    unit: 'PWM'
+    combinations:
+      - combo: [0b00, 0b10]
+        value: 0.0
+      - combo: 0b11
+        value: 0.5
+      - combo: 0b01
+        value: 1.0
+  side_led_pin:
+    name: "SideLed"
+    type: electronic_io.DigitalPinCombo
+    pins:
+      - pin: 'C2'
+      - pin: 'C3'
+    unit: 'PWM'
+    combinations:
+      - combo: [0b00, 0b10]
+        value: 0.0
+      - combo: 0b11
+        value: 0.5
+      - combo: 0b01
+        value: 1.0
+
 electronic_io_devices:
 
   power_switch_sw1:
@@ -34,49 +64,13 @@ electronic_io_devices:
   led_front:
     topic: "led/front"
     type: electronic_io.DimmableLED
-    discrete_steps:
-      - interval: [0.0, 0.25]
-        readback_value: 0.0
-        pins:
-          - pin: 'C1'
-            value: False
-      - interval: [0.25, 0.75]
-        readback_value: 0.5
-        pins:
-          - pin: 'C1'
-            value: True
-          - pin: 'C0'
-            value: True
-      - interval: [0.75, 1.0]
-        readback_value: 1.0
-        pins:
-          - pin: 'C1'
-            value: True
-          - pin: 'C0'
-            value: False
+    pwm_pin:
+      pin: 'FrontLed'
   led_side:
     topic: "led/side"
     type: electronic_io.DimmableLED
-    discrete_steps:
-      - interval: [0.0, 0.25]
-        readback_value: 0.0
-        pins:
-          - pin: 'C3'
-            value: False
-      - interval: [0.25, 0.75]
-        readback_value: 0.5
-        pins:
-          - pin: 'C3'
-            value: True
-          - pin: 'C2'
-            value: True
-      - interval: [0.75, 1.0]
-        readback_value: 1.0
-        pins:
-          - pin: 'C3'
-            value: True
-          - pin: 'C2'
-            value: False
+    pwm_pin:
+      pin: 'SideLed'
   led_all:
     topic: "led/all"
     type: electronic_io.OutputGroup

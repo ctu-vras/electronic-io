@@ -26,7 +26,7 @@ board:
       is_writable: True
     - name: Output8
       is_writable: True
-  raw_analog:
+  digitized_analog:
     - name: PWM1
       is_readable: True
       is_writable: True
@@ -42,6 +42,7 @@ board:
     - name: PWM5
       is_readable: True
       is_writable: True
+  raw_analog:
     - name: Temp1
       is_readable: True
       fake_value: 50.1

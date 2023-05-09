@@ -14,7 +14,7 @@ class IOBoardServer(object):
 
     def __init__(self, base_topic):
         """
-        :param str base_topic: The base topic to use for publishing messages. 
+        :param str base_topic: The base topic to use for publishing messages.
         """
         self.base_topic = rospy.names.resolve_name(base_topic)
         self.info_topic = rospy.names.ns_join(base_topic, "io_info")

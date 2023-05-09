@@ -7,6 +7,7 @@
 ROS node that reads configuration of I/O devices and the runs them.
 
 Parameters:
+- `~virtual_pins` (dict): The configuration dictionary specifying virtual pins.
 - `~electronic_io_devices` (dict): The config dictionary specifying the devices.
 - `~poll_rate` (float, optional): Rate at which all pins will be read and the device will produce output.
 """
@@ -15,7 +16,7 @@ import sys
 
 import rospy
 
-from electronic_io import InputDevice, OutputDevice, IOBoardClient, load_devices
+from electronic_io import InputDevice, OutputDevice, IOBoardClient, load_devices, load_virtual_pins
 from electronic_io_msgs.msg import Readings
 from electronic_io_msgs.srv import ReadRequest
 
@@ -25,6 +26,13 @@ class Devices:
         io_topic = "io_board"
 
         self.io_board = IOBoardClient(io_topic)
+
+        virtual_pins_conf = rospy.get_param("~virtual_pins", {})
+        if not isinstance(virtual_pins_conf, dict):
+            raise AttributeError("Invalid configuration of electronic_io/devices node. "
+                                 "Parameter ~virtual_pins has to be a dictionary.")
+
+        load_virtual_pins(virtual_pins_conf, self.io_board)
 
         devices_conf = rospy.get_param("~electronic_io_devices", None)
         if not isinstance(devices_conf, dict):

@@ -45,6 +45,10 @@ class IOPin(object):
         """
         raise NotImplementedError()
 
+
+class RealIOPin(IOPin):
+    """A real input-output pin on an I/O board."""
+
     @staticmethod
     def from_dict(config, io_info):
         """Create the pin from the given config dictionary and board information.
@@ -58,7 +62,7 @@ class IOPin(object):
         raise NotImplementedError()
 
 
-class DigitalPin(IOPin):
+class DigitalPin(RealIOPin):
     """Digital I/O pin (represents a binary value)."""
 
     def __init__(self, name, pin_info, inverted):
@@ -100,7 +104,7 @@ class DigitalPin(IOPin):
         req.digital_pins.append(self.name)
 
 
-class DigitizedAnalogPin(IOPin):
+class DigitizedAnalogPin(RealIOPin):
     """Digitized analog I/O pin (works with integral readings of an A/D converter)."""
 
     def __init__(self, name, pin_info):
@@ -140,7 +144,7 @@ class DigitizedAnalogPin(IOPin):
         req.digitized_analog_pins.append(self.name)
 
 
-class RawAnalogPin(IOPin):
+class RawAnalogPin(RealIOPin):
     """Raw analog I/O pin (works directly with float values)."""
 
     def __init__(self, name, pin_info):
@@ -178,3 +182,20 @@ class RawAnalogPin(IOPin):
 
     def add_read_request(self, req):
         req.raw_analog_pins.append(self.name)
+
+
+class VirtualPin(IOPin):
+    """Virtual I/O board pin which performs some computation on real I/O pins."""
+
+    @staticmethod
+    def from_dict(pin_name, config, io_board):
+        """Create the pin from the given config dictionary and board information.
+
+        :param str pin_name: Name of the pin (its config dictionary key).
+        :param dict config: Configuration of the pin.
+        :param IOBoardClient io_board: The I/O board this pin should use (but it is not added to it automatically).
+        :return: The virtual pin.
+        :rtype: VirtualPin
+        :raises AttributeError: When wrong configuration is passed.
+        """
+        raise NotImplementedError()

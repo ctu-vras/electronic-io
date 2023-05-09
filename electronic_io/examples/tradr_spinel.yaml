@@ -1,6 +1,43 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # SPDX-FileCopyrightText: Czech Technical University in Prague
 
+virtual_pins:
+  pwm1:  # Exposes PWM interface on digitized analog pin with values 0 - 200.
+    name: "RawPWM1"
+    type: electronic_io.LinearADCPin
+    adc_pin:
+      pin: 'PWM1'
+    unit: 'PWM'
+    linear_coeff: 0.005  # 1 / 200
+  pwm2:  # Exposes PWM interface on digitized analog pin with values 0 - 200.
+    name: "RawPWM2"
+    type: electronic_io.LinearADCPin
+    adc_pin:
+      pin: 'PWM2'
+    unit: 'PWM'
+    linear_coeff: 0.005  # 1 / 200
+  pwm3:  # Exposes PWM interface on digitized analog pin with values 0 - 200.
+    name: "RawPWM3"
+    type: electronic_io.LinearADCPin
+    adc_pin:
+      pin: 'PWM3'
+    unit: 'PWM'
+    linear_coeff: 0.005  # 1 / 200
+  pwm4:  # Exposes PWM interface on digitized analog pin with values 0 - 200.
+    name: "RawPWM4"
+    type: electronic_io.LinearADCPin
+    adc_pin:
+      pin: 'PWM4'
+    unit: 'PWM'
+    linear_coeff: 0.005  # 1 / 200
+  pwm5:  # Exposes PWM interface on digitized analog pin with values 0 - 200.
+    name: "RawPWM5"
+    type: electronic_io.LinearADCPin
+    adc_pin:
+      pin: 'PWM5'
+    unit: 'PWM'
+    linear_coeff: 0.005  # 1 / 200
+
 electronic_io_devices:
 
   power_switch_motors:
@@ -16,48 +53,43 @@ electronic_io_devices:
   led_front:
     topic: "led/front"
     type: electronic_io.DimmableLED
-    pwm:
-      pwm_pin:
-        pin: 'PWM4'
-      enable_pin:
-        pin: 'Output4'
-        inverted: False
+    pwm_pin:
+      pin: 'RawPWM4'
+    enable_pin:
+      pin: 'Output4'
+      inverted: False
   led_right:
     topic: "led/right"
     type: electronic_io.DimmableLED
-    pwm:
-      pwm_pin:
-        pin: 'PWM1'
-      enable_pin:
-        pin: 'Output1'
-        inverted: False
+    pwm_pin:
+      pin: 'RawPWM1'
+    enable_pin:
+      pin: 'Output1'
+      inverted: False
   led_rear:
     topic: "led/rear"
     type: electronic_io.DimmableLED
-    pwm:
-      pwm_pin:
-        pin: 'PWM2'
-      enable_pin:
-        pin: 'Output2'
-        inverted: False
+    pwm_pin:
+      pin: 'RawPWM2'
+    enable_pin:
+      pin: 'Output2'
+      inverted: False
   led_left:
     topic: "led/left"
     type: electronic_io.DimmableLED
-    pwm:
-      pwm_pin:
-        pin: 'PWM3'
-      enable_pin:
-        pin: 'Output3'
-        inverted: False
+    pwm_pin:
+      pin: 'RawPWM3'
+    enable_pin:
+      pin: 'Output3'
+      inverted: False
   led_top:
     topic: "led/top"
     type: electronic_io.DimmableLED
-    pwm:
-      pwm_pin:
-        pin: 'PWM5'
-      enable_pin:
-        pin: 'Output5'
-        inverted: False
+    pwm_pin:
+      pin: 'RawPWM5'
+    enable_pin:
+      pin: 'Output5'
+      inverted: False
   
   led_onoff_all:
     topic: "led/onoff_all"

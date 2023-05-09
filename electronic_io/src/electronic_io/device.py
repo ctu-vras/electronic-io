@@ -21,6 +21,7 @@ from electronic_io_msgs.srv import ReadRequest, WriteRequest
 from std_srvs.srv import SetBool, SetBoolResponse, Trigger, TriggerResponse
 
 from .io_board_client import IOBoardClient
+from .pins import VirtualPin
 
 
 class Device(object):
@@ -273,6 +274,71 @@ class MetaDevice(object):
             self._devices[device_name] = devices[device_name]
 
 
+def load_class(conf, name):
+    """Dynamically load a class specified by the given config's 'type' key.
+
+    :param dict conf: Configuration dictionary. Has to contain key 'type'.
+    :param str name: The name to be used in error messages.
+    :return: The corresponding type, or None.
+    :rtype: type or None
+    """
+    if "type" not in conf:
+        rospy.logerr("Invalid configuration of " + name + ". It has to contain 'type' key.")
+        return None
+
+    class_type = conf["type"]
+    if "." not in class_type:
+        rospy.logerr("Invalid type of " + name + ". It has to be of form 'package.Class'.")
+
+    class_module, class_class = class_type.rsplit(".", 1)
+
+    try:
+        module = importlib.import_module(class_module)
+    except Exception as e:
+        rospy.logerr("Could not import module " + class_module + ": " + str(e))
+        return None
+
+    if not getattr(module, class_class):
+        rospy.logerr("Could not find class " + class_class + " in module " + class_module + ".")
+        return None
+
+    return getattr(module, class_class)
+
+
+def load_virtual_pins(virtual_pins_conf, io_board):
+    """Load virtual pins from the given config dictionary into the `io_board`.
+
+    :param dict virtual_pins_conf: The dictionary with configuration.
+    :param IOBoardClient io_board: The I/O board for which the virtual pins are defined.
+    :raises AttributeError: If invalid configuration has been provided.
+    """
+    for pin_name in virtual_pins_conf:
+        pin_conf = virtual_pins_conf[pin_name]
+
+        name = "virtual pin " + pin_name
+        clazz = load_class(pin_conf, name)
+        if clazz is None:
+            continue
+
+        if not hasattr(clazz, "from_dict"):
+            rospy.logerr("Virtual pin class " + str(clazz) + " does not have method from_dict().")
+            continue
+
+        from_dict = getattr(clazz, "from_dict")
+        try:
+            pin = from_dict(pin_name, pin_conf, io_board)
+        except Exception as e:
+            rospy.logerr("Could not setup " + name + ": " + str(e))
+            continue
+
+        if not isinstance(pin, VirtualPin):
+            rospy.logerr(name.capitalize() + " does not inherit from electronic_io.VirtualPin class.")
+            continue
+
+        io_board.add_virtual_pin(pin)
+        rospy.loginfo("Successfully added " + name)
+
+
 def load_devices(devices_conf, io_board):
     """Load devices from the given config dictionary.
 
@@ -286,26 +352,11 @@ def load_devices(devices_conf, io_board):
     devices = {}
     for device_name in devices_conf:
         device_conf = devices_conf[device_name]
-        if "type" not in device_conf:
-            rospy.logerr("Invalid configuration of device " + device_name + ". It has to contain 'type' key.")
+        name = "device " + device_name
+
+        clazz = load_class(device_conf, name)
+        if clazz is None:
             continue
-        device_type = device_conf["type"]
-        if "." not in device_type:
-            rospy.logerr("Invalid type of device " + device_name + ". It has to be of form 'package.Class'.")
-
-        device_module, device_class = device_type.rsplit(".", 1)
-
-        try:
-            module = importlib.import_module(device_module)
-        except Exception as e:
-            rospy.logerr("Could not import module " + device_module + ": " + str(e))
-            continue
-
-        if not getattr(module, device_class):
-            rospy.logerr("Could not find class " + device_class + " in module " + device_module + ".")
-            continue
-
-        clazz = getattr(module, device_class)
 
         if issubclass(clazz, MetaDevice):
             meta_device_args.append([clazz, device_name, device_conf])
@@ -314,11 +365,11 @@ def load_devices(devices_conf, io_board):
         try:
             device = clazz(device_name, device_conf, io_board)
         except Exception as e:
-            rospy.logerr("Could not setup device " + device_name + ": " + str(e))
+            rospy.logerr("Could not setup " + name + ": " + str(e))
             continue
 
         if not isinstance(device, Device):
-            rospy.logerr("Device " + device_name + " does not inherit from electronic_io.Device class.")
+            rospy.logerr(name.capitalize() + " does not inherit from electronic_io.Device class.")
             continue
 
         devices[device_name] = device

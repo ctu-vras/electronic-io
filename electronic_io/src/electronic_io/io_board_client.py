@@ -4,12 +4,13 @@
 """Client for communicating with an I/O board."""
 
 import time
+from typing import Dict
 
-from electronic_io_msgs.msg import IOInfo, Readings
+from electronic_io_msgs.msg import IOInfo, Readings, DigitalIOInfo, DigitizedAnalogIOInfo, RawAnalogIOInfo
 from electronic_io_msgs.srv import Read, ReadRequest, ReadResponse, Write, WriteRequest, WriteResponse
 import rospy
 
-from .pins import DigitalPin, DigitizedAnalogPin, RawAnalogPin
+from .pins import DigitalPin, DigitizedAnalogPin, RawAnalogPin, VirtualPin
 
 
 class IOBoardClient(object):
@@ -23,6 +24,8 @@ class IOBoardClient(object):
         self.info_topic = rospy.names.ns_join(self.base_topic, "io_info")
         self.read_service = rospy.names.ns_join(self.base_topic, "read")
         self.write_service = rospy.names.ns_join(self.base_topic, "write")
+
+        self._virtual_pins = {}  # type: Dict[str, VirtualPin]
 
         self._io_info = None
         self._read_srv = None
@@ -86,7 +89,7 @@ class IOBoardClient(object):
         """Get the I/O pins description.
 
         :return: Pin descriptions.
-        :rtype: IOInfo 
+        :rtype: IOInfo
         """
         return self._io_info
 
@@ -137,13 +140,37 @@ class IOBoardClient(object):
             self._connect_write_srv()
             return self.write(req)
 
+    def add_virtual_pin(self, pin):
+        """Add the given virtual pin.
+
+        :param VirtualPin pin: The virtual pin to add.
+        """
+        self._virtual_pins[pin.name] = pin
+
+    def get_virtual_pin(self, config):
+        """Get virtual pin corresponding to the given config.
+
+        :param dict config: Config with key 'pin' that specifies name of the pin.
+        :return: The virtual pin or None if it does not exist.
+        :rtype: VirtualPin or None
+        """
+        if "pin" not in config:
+            raise AttributeError("Expected 'pin' key in config not found. The config was: " + str(config))
+        name = config["pin"]
+        if name in self._virtual_pins:
+            return self._virtual_pins[name]
+        return None
+
     def get_digital_pin(self, config):
         """Get a digital pin corresponding to the given config.
 
         :param dict config: The pin's config dictionary.
         :return: The pin.
-        :rtype: DigitalPin
+        :rtype: DigitalPin or VirtualPin
         """
+        virtual_pin = self.get_virtual_pin(config)
+        if virtual_pin is not None and isinstance(virtual_pin.pin_info, DigitalIOInfo):
+            return virtual_pin
         return DigitalPin.from_dict(config, self._io_info)
 
     def get_digitized_analog_pin(self, config):
@@ -151,8 +178,11 @@ class IOBoardClient(object):
 
         :param dict config: The pin's config dictionary.
         :return: The pin.
-        :rtype: DigitizedAnalogPin
+        :rtype: DigitizedAnalogPin or VirtualPin
         """
+        virtual_pin = self.get_virtual_pin(config)
+        if virtual_pin is not None and isinstance(virtual_pin.pin_info, DigitizedAnalogIOInfo):
+            return virtual_pin
         return DigitizedAnalogPin.from_dict(config, self._io_info)
 
     def get_raw_analog_pin(self, config):
@@ -160,6 +190,9 @@ class IOBoardClient(object):
 
         :param dict config: The pin's config dictionary.
         :return: The pin.
-        :rtype: RawAnalogPin
+        :rtype: RawAnalogPin or VirtualPin
         """
+        virtual_pin = self.get_virtual_pin(config)
+        if virtual_pin is not None and isinstance(virtual_pin.pin_info, RawAnalogIOInfo):
+            return virtual_pin
         return RawAnalogPin.from_dict(config, self._io_info)
