@@ -40,6 +40,7 @@
     <electronic_io device="electronic_io.PowerSwitch" />
     <electronic_io device="electronic_io.Thermometer" />
     <electronic_io device="electronic_io.Voltmeter" />
+    <electronic_io virtual_pin="electronic_io.BinaryPWM" />
     <electronic_io virtual_pin="electronic_io.DigitalPinCombo" />
     <electronic_io virtual_pin="electronic_io.LinearADCPin" />
   </export>

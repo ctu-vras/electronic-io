@@ -55,6 +55,7 @@ The only thing that needs to be coded is the I/O board driver that can actually 
 
 ## Virtual pins available in this package
 
+- Binary PWM (type `electronic_io.BinaryPWM`)
 - Digital Pin Combo (type `electronic_io.DigitalPinCombo`)
 - Linear ADC Pin (type `electronic_io.LinearADCPin`)
 

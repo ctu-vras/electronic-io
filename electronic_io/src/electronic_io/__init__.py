@@ -8,6 +8,7 @@ from .devices.dimmable_led import DimmableLED, DimmableLEDReadback
 from .devices.output_group import OutputGroup
 from .devices.battery import Battery
 
+from .virtual_pins.binary_pwm import BinaryPWM
 from .virtual_pins.digital_pin_combo import DigitalPinCombo
 from .virtual_pins.linear_adc_pin import LinearADCPin
 

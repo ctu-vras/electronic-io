@@ -48,6 +48,7 @@ if (CATKIN_ENABLE_TESTING)
     src/${PROJECT_NAME}/devices/power_switch.py
     src/${PROJECT_NAME}/devices/thermometer.py
     src/${PROJECT_NAME}/devices/voltmeter.py
+    src/${PROJECT_NAME}/virtual_pins/binary_pwm.py
     src/${PROJECT_NAME}/virtual_pins/digital_pin_combo.py
     src/${PROJECT_NAME}/virtual_pins/linear_adc_pin.py
   )
