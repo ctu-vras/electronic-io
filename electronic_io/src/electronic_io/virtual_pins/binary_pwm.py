@@ -91,8 +91,8 @@ class BinaryPWM(VirtualPin):
         pin_info.max_value = config.get('max_value', max(readback_on_value, readback_off_value))
         pin_info.sampling_period = rospy.Duration(config.get('sampling_period', 0.0))
         pin_info.pin.name = name
-        pin_info.pin.is_readable = bool(config.get("is_readable", pin.pin_info.is_readable))
-        pin_info.pin.is_writable = bool(config.get("is_writable", pin.pin_info.is_writable))
-        pin_info.pin.can_persist = bool(config.get("can_persist", pin.pin_info.can_persist))
+        pin_info.pin.is_readable = bool(config.get("is_readable", pin.pin_info.pin.is_readable))
+        pin_info.pin.is_writable = bool(config.get("is_writable", pin.pin_info.pin.is_writable))
+        pin_info.pin.can_persist = bool(config.get("can_persist", pin.pin_info.pin.can_persist))
 
         return BinaryPWM(name, pin_info, pin, on_threshold, readback_on_value, readback_off_value)
