@@ -53,13 +53,39 @@ class RealIOPin(IOPin):
     def from_dict(config, io_info):
         """Create the pin from the given config dictionary and board information.
 
-        :param dict config: The configuration dictionary.
+        :param config: The configuration dictionary (or a string containing just the pin name).
+        :type config: dict or str
         :param IOInfo io_info: Info about the I/O pins of a board.
         :return: The configured pin.
         :rtype: IOPin
         :raises AttributeError: When wrong configuration is passed.
         """
         raise NotImplementedError()
+
+    @staticmethod
+    def find_pin_info(config, io_info):
+        """Create the pin from the given config dictionary and board information.
+
+        :param config: The configuration dictionary (or a string containing just the pin name).
+        :type config: dict or str
+        :param io_info: Info about the I/O pins of a board.
+        :type io_info: list of DigitalIOInfo or list of DigitizedAnalogIOInfo or list of RawAnalogIOInfo
+        :return: The corresponding pin info if it was found, and the config dictionary. If the function does not raise,
+                 the config is guaranteed to contain key 'pin' with the name of the requested pin.
+        :rtype: (DigitalIOInfo or DigitizedAnalogIOInfo or RawAnalogIOInfo or None, dict)
+        :raises AttributeError: When wrong configuration is passed.
+        """
+        if isinstance(config, str):
+            config = {"pin": config}
+        if not isinstance(config, dict):
+            raise AttributeError("Config has to be a dictionary or string. The config was: " + repr(config))
+        if "pin" not in config:
+            raise AttributeError("Expected 'pin' key not found in config. The config was: " + repr(config))
+        name = config["pin"]
+        for info in io_info:
+            if info.pin.name == name:
+                return info, config
+        return None, config
 
 
 class DigitalPin(RealIOPin):
@@ -77,14 +103,9 @@ class DigitalPin(RealIOPin):
 
     @staticmethod
     def from_dict(config, io_info):  # type: (dict, IOInfo) -> DigitalPin
-        if "pin" not in config:
-            raise AttributeError("Expected 'pin' key in config not found. The config was: " + str(config))
+        pin_info, config = RealIOPin.find_pin_info(config, io_info.digital)
         name = config["pin"]
-        for info in io_info.digital:  # type: DigitalIOInfo
-            if info.pin.name == name:
-                pin_info = info
-                break
-        else:
+        if pin_info is None:
             raise AttributeError("Could not find digital pin " + name)
         return DigitalPin(name, pin_info, config.get("inverted", False))
 
@@ -117,14 +138,9 @@ class DigitizedAnalogPin(RealIOPin):
 
     @staticmethod
     def from_dict(config, io_info):  # type: (dict, IOInfo) -> DigitizedAnalogPin
-        if "pin" not in config:
-            raise AttributeError("Expected 'pin' key in config not found. The config was: " + str(config))
+        pin_info, config = RealIOPin.find_pin_info(config, io_info.digitized_analog)
         name = config["pin"]
-        for info in io_info.digitized_analog:  # type: DigitizedAnalogIOInfo
-            if info.pin.name == name:
-                pin_info = info
-                break
-        else:
+        if pin_info is None:
             raise AttributeError("Could not find digitized analog pin " + name)
         return DigitizedAnalogPin(name, pin_info)
 
@@ -157,14 +173,9 @@ class RawAnalogPin(RealIOPin):
 
     @staticmethod
     def from_dict(config, io_info):  # type: (dict, IOInfo) -> RawAnalogPin
-        if "pin" not in config:
-            raise AttributeError("Expected 'pin' key in config not found. The config was: " + str(config))
+        pin_info, config = RealIOPin.find_pin_info(config, io_info.raw_analog)
         name = config["pin"]
-        for info in io_info.raw_analog:  # type: RawAnalogIOInfo
-            if info.pin.name == name:
-                pin_info = info
-                break
-        else:
+        if pin_info is None:
             raise AttributeError("Could not find raw analog pin " + name)
         return RawAnalogPin(name, pin_info)
 

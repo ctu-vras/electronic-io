@@ -150,10 +150,13 @@ class IOBoardClient(object):
     def get_virtual_pin(self, config):
         """Get virtual pin corresponding to the given config.
 
-        :param dict config: Config with key 'pin' that specifies name of the pin.
+        :param config: Config with key 'pin' that specifies name of the pin, or just a string with the name.
+        :type config: dict or str
         :return: The virtual pin or None if it does not exist.
         :rtype: VirtualPin or None
         """
+        if isinstance(config, str):
+            config = {"pin": config}
         if "pin" not in config:
             raise AttributeError("Expected 'pin' key in config not found. The config was: " + str(config))
         name = config["pin"]
