@@ -5,36 +5,31 @@ virtual_pins:
   pwm1:  # Exposes PWM interface on digitized analog pin with values 0 - 200.
     name: "RawPWM1"
     type: electronic_io.LinearADCPin
-    adc_pin:
-      pin: 'PWM1'
+    adc_pin: 'PWM1'
     unit: 'PWM'
     linear_coeff: 0.005  # 1 / 200
   pwm2:  # Exposes PWM interface on digitized analog pin with values 0 - 200.
     name: "RawPWM2"
     type: electronic_io.LinearADCPin
-    adc_pin:
-      pin: 'PWM2'
+    adc_pin: 'PWM2'
     unit: 'PWM'
     linear_coeff: 0.005  # 1 / 200
   pwm3:  # Exposes PWM interface on digitized analog pin with values 0 - 200.
     name: "RawPWM3"
     type: electronic_io.LinearADCPin
-    adc_pin:
-      pin: 'PWM3'
+    adc_pin: 'PWM3'
     unit: 'PWM'
     linear_coeff: 0.005  # 1 / 200
   pwm4:  # Exposes PWM interface on digitized analog pin with values 0 - 200.
     name: "RawPWM4"
     type: electronic_io.LinearADCPin
-    adc_pin:
-      pin: 'PWM4'
+    adc_pin: 'PWM4'
     unit: 'PWM'
     linear_coeff: 0.005  # 1 / 200
   pwm5:  # Exposes PWM interface on digitized analog pin with values 0 - 200.
     name: "RawPWM5"
     type: electronic_io.LinearADCPin
-    adc_pin:
-      pin: 'PWM5'
+    adc_pin: 'PWM5'
     unit: 'PWM'
     linear_coeff: 0.005  # 1 / 200
 
@@ -44,58 +39,40 @@ electronic_io_devices:
     topic: "power_switch/motors"
     type: electronic_io.PowerSwitch
     output_pins:
-      - pin: 'Output7'
-        inverted: False
-    readback_pin:  # Not actually needed. When there is only one output pin and it is readable, readback is automatically set
-      pin: 'Output7'
-      inverted: False
+      - 'Output7'
+    readback_pin: 'Output7'  # Not actually needed. When there is only one output pin and it is readable, readback is automatically set
 
   led_front:
     topic: "led/front"
     type: electronic_io.DimmableLED
-    pwm_pin:
-      pin: 'RawPWM4'
-    enable_pin:
-      pin: 'Output4'
-      inverted: False
+    pwm_pin: 'RawPWM4'
+    enable_pin: 'Output4'
   led_right:
     topic: "led/right"
     type: electronic_io.DimmableLED
-    pwm_pin:
-      pin: 'RawPWM1'
-    enable_pin:
-      pin: 'Output1'
-      inverted: False
+    pwm_pin: 'RawPWM1'
+    enable_pin: 'Output1'
   led_rear:
     topic: "led/rear"
     type: electronic_io.DimmableLED
-    pwm_pin:
-      pin: 'RawPWM2'
-    enable_pin:
-      pin: 'Output2'
-      inverted: False
+    pwm_pin: 'RawPWM2'
+    enable_pin: 'Output2'
   led_left:
     topic: "led/left"
     type: electronic_io.DimmableLED
-    pwm_pin:
-      pin: 'RawPWM3'
-    enable_pin:
-      pin: 'Output3'
-      inverted: False
+    pwm_pin: 'RawPWM3'
+    enable_pin: 'Output3'
   led_top:
     topic: "led/top"
     type: electronic_io.DimmableLED
-    pwm_pin:
-      pin: 'RawPWM5'
-    enable_pin:
-      pin: 'Output5'
-      inverted: False
+    pwm_pin: 'RawPWM5'
+    enable_pin: 'Output5'
   
   led_onoff_all:
     topic: "led/onoff_all"
     type: electronic_io.PowerSwitch
     output_pins:
-      - pin: 'Output8'
+      - 'Output8'
   
   led_all:
     topic: "led/all"
@@ -119,41 +96,33 @@ electronic_io_devices:
   temperature_top_box:
     topic: "temperature/top_box"
     type: electronic_io.Thermometer
-    input_pin:
-      pin: 'Temp1'
+    input_pin: 'Temp1'
   temperature_nuc_left:
     topic: "temperature/nuc_left"
     type: electronic_io.Thermometer
-    input_pin:
-      pin: 'Temp2'
+    input_pin: 'Temp2'
   temperature_nuc_right:
     topic: "temperature/nuc_right"
     type: electronic_io.Thermometer
-    input_pin:
-      pin: 'Temp3'
+    input_pin: 'Temp3'
   temperature_main_pc_left:
     topic: "temperature/main_pc_left"
     type: electronic_io.Thermometer
-    input_pin:
-      pin: 'Temp4'
+    input_pin: 'Temp4'
   temperature_main_pc_right:
     topic: "temperature/main_pc_right"
     type: electronic_io.Thermometer
-    input_pin:
-      pin: 'Temp5'
+    input_pin: 'Temp5'
 
   power_distribution_voltage_24v:
     topic: "power_distribution/voltage_24v"
     type: electronic_io.Voltmeter
-    input_pin:
-      pin: 'Voltage1'
+    input_pin: 'Voltage1'
   power_distribution_voltage_12v:
     topic: "power_distribution/voltage_12v"
     type: electronic_io.Voltmeter
-    input_pin:
-      pin: 'Voltage2'
+    input_pin: 'Voltage2'
   power_distribution_voltage_5v:
     topic: "power_distribution/voltage_5v"
     type: electronic_io.Voltmeter
-    input_pin:
-      pin: 'Voltage3'
+    input_pin: 'Voltage3'

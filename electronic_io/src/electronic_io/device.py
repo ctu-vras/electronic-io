@@ -365,6 +365,8 @@ def load_devices(devices_conf, io_board):
         try:
             device = clazz(device_name, device_conf, io_board)
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             rospy.logerr("Could not setup " + name + ": " + str(e))
             continue
 

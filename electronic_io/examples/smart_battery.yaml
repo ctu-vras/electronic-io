@@ -5,8 +5,7 @@ virtual_pins:
   voltage_1:  # Voltage sensor which measures -12 to +12 V with 12 bits of precision
     name: "Voltage1"
     type: electronic_io.LinearADCPin
-    adc_pin:
-      pin: 'I1'
+    adc_pin: 'I1'
     unit: 'V'
     linear_coeff: 0.005859375  # 24 / 2^12
     constant_coeff: -12.0
@@ -16,16 +15,14 @@ virtual_pins:
   voltage_2:
     name: "Voltage2"
     type: electronic_io.LinearADCPin
-    adc_pin:
-      pin: 'I2'
+    adc_pin: 'I2'
     unit: 'V'
     linear_coeff: 0.005859375  # 24 / 2^12
     constant_coeff: -12.0
   voltage_3:
     name: "Voltage3"
     type: electronic_io.LinearADCPin
-    adc_pin:
-      pin: 'I3'
+    adc_pin: 'I3'
     unit: 'V'
     linear_coeff: 0.005859375  # 24 / 2^12
     constant_coeff: -12.0
@@ -35,18 +32,15 @@ electronic_io_devices:
   voltage_cell_1:
     topic: "battery/cell_voltage/cell_1"
     type: electronic_io.Voltmeter
-    input_pin:
-      pin: 'Voltage1'
+    input_pin: 'Voltage1'
   voltage_cell_2:
     topic: "battery/cell_voltage/cell_2"
     type: electronic_io.Voltmeter
-    input_pin:
-      pin: 'Voltage2'
+    input_pin: 'Voltage2'
   voltage_cell_3:
     topic: "battery/cell_voltage/cell_3"
     type: electronic_io.Voltmeter
-    input_pin:
-      pin: 'Voltage3'
+    input_pin: 'Voltage3'
   
   battery:
     topic: "battery"
@@ -57,5 +51,4 @@ electronic_io_devices:
       - voltage_cell_3
     power_supply_technology: POWER_SUPPLY_TECHNOLOGY_LIPO
     design_capacity: 10.0
-    present_pin:
-      pin: 'Input7'
+    present_pin: 'Input7'

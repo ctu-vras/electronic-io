@@ -6,8 +6,8 @@ virtual_pins:
     name: "FrontLed"
     type: electronic_io.DigitalPinCombo
     pins:
-      - pin: 'C0'
-      - pin: 'C1'
+      - 'C0'
+      - 'C1'
     unit: 'PWM'
     combinations:
       - combo: [0b00, 0b10]
@@ -20,8 +20,8 @@ virtual_pins:
     name: "SideLed"
     type: electronic_io.DigitalPinCombo
     pins:
-      - pin: 'C2'
-      - pin: 'C3'
+      - 'C2'
+      - 'C3'
     unit: 'PWM'
     combinations:
       - combo: [0b00, 0b10]
@@ -37,40 +37,29 @@ electronic_io_devices:
     topic: "power_switch/sw1"
     type: electronic_io.PowerSwitch
     output_pins: 
-      - pin: 'C5'
-        inverted: False
-    readback_pin:
-      pin: 'C5'
-      inverted: False
+      - 'C5'
+    readback_pin: 'C5'
   power_switch_motors:
     topic: "power_switch/motors"
     type: electronic_io.PowerSwitch
     output_pins:
-      - pin: 'C6'
-        inverted: False
-    readback_pin:
-      pin: 'C6'
-      inverted: False
+      - 'C6'
+    readback_pin: 'C6'
   power_switch_sw3:
     topic: "power_switch/sw3"
     type: electronic_io.PowerSwitch
     output_pins:
-      - pin: 'C4'
-        inverted: False
-    readback_pin:
-      pin: 'C4'
-      inverted: False
+      - 'C4'
+    readback_pin: 'C4'
 
   led_front:
     topic: "led/front"
     type: electronic_io.DimmableLED
-    pwm_pin:
-      pin: 'FrontLed'
+    pwm_pin: 'FrontLed'
   led_side:
     topic: "led/side"
     type: electronic_io.DimmableLED
-    pwm_pin:
-      pin: 'SideLed'
+    pwm_pin: 'SideLed'
   led_all:
     topic: "led/all"
     type: electronic_io.OutputGroup

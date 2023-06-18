@@ -46,7 +46,13 @@ class PowerSwitchReadback(InputDevice):
     def __init__(self, name, config, io_board):
         super(PowerSwitchReadback, self).__init__(name, config, io_board, PowerSwitchStateStamped, 1, True)
 
-        self._readback_pin = io_board.get_digital_pin(config)
+        if "readback_pin" in config:
+            self._readback_pin = io_board.get_digital_pin(config["readback_pin"])
+        elif len(config.get("output_pins", [])) == 1:
+            self._readback_pin = io_board.get_digital_pin(config["output_pins"][0])
+        else:
+            raise AttributeError("Readback pin for %s is defined neither via readback_pin nor via output_pins." % (
+                self.get_name(),))
 
         if not self._readback_pin.pin_info.pin.is_readable:
             raise AttributeError("Readback pin %s for %s is not readable!" % (self._readback_pin.name, self.get_name()))
@@ -91,14 +97,14 @@ class PowerSwitch(DigitalOutputDevice):
                 raise AttributeError("Output pin %s for %s is not writable!" % (pin.name, self.get_name()))
             self._output_pins.append(pin)
 
-        if "readback_pin" in config:
-            config["readback_pin"]["topic"] = self.topic
-            dev = PowerSwitchReadback(name, config["readback_pin"], io_board)
+        try:
+            dev = PowerSwitchReadback(name, config, io_board)
             self.set_readback_device(dev)
-        elif len(self._output_pins) == 1 and self._output_pins[0].pin_info.pin.is_readable:
-            config["output_pins"][0]["topic"] = self.topic
-            dev = PowerSwitchReadback(name, config["output_pins"][0], io_board)
-            self.set_readback_device(dev)
+        except AttributeError as e:
+            # An exception can be thrown if readback setup fails. We only want that to propagate in case readback_pin
+            # was explicitly set - otherwise it is not clear whether the user wanted readback or not.
+            if "readback_pin" in config:
+                raise e
 
     def get_name(self):
         return "Power switch " + self.name
