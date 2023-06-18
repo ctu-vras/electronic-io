@@ -2,7 +2,7 @@
 Changelog for package electronic_io_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.1 (2023-06-19)
+------------------
 * Initial commit
 * Contributors: Martin Pecka
