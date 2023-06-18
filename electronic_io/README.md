@@ -18,7 +18,7 @@ The three basic concepts in this package are:
 
 The idea is that each of these could be representing a different real-world entity:
 
-- The set of real pins can describe a particular I/O board, like Raspbery Pi.
+- The set of real pins can describe a particular I/O board, like Raspberry Pi.
 - The set of virtual pins translates datasheets of the connected components into sensible numbers (e.g. ADC -> Voltage).
 - The set of devices interprets the pins and virtual pins in terms of high-level devices.
 
@@ -34,14 +34,28 @@ power_switch_motors:
   topic: "power_switch/motors"
   type: electronic_io.PowerSwitch
   output_pins:
-    - pin: 'Output7'
-      inverted: False
+    - 'Output7'
 ```
 
 This configuration provides topic `power_switch/motors` with the state of the switch, and services
 `power_switch/motors/set` and `power_switch/motors/toggle` that can change the state of the relay.
 
 The only thing that needs to be coded is the I/O board driver that can actually read and write to pin `Output7`.
+
+Digital pins can also easily be inverted for usage in devices. That can be achieved via advanced pin syntax. Instead of:
+
+```yaml
+output_pins:
+  - 'Output7'
+```
+
+write
+
+```yaml
+output_pins:
+  - pin: 'Output7'
+    inverted: True
+```
 
 ## Devices available in this package
 
@@ -82,7 +96,7 @@ These steps are generally required when you want to specify a new virtual pin (i
   in CMakeLists.txt, a setup.py file and the device's package has to be installed.
 - Add the following to package.xml `<export>` section: `<electronic_io virtual_pin="my_package.MyPin" />`.
 
-Specifically when adding a device to this package, do not forget to:
+Specifically when adding a virtual pin to this package, do not forget to:
 
 - Add it to `src/electronic_io/__init__.py`.
 - Add it to this readme.
