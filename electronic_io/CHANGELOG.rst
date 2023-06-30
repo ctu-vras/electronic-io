@@ -2,6 +2,9 @@
 Changelog for package electronic_io
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 1.0.1 (2023-06-19)
 ------------------
 * Added support for simplified specification of pins in config.
