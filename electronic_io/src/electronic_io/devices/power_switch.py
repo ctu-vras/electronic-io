@@ -79,7 +79,7 @@ class PowerSwitchReadback(InputDevice):
 
 
 class PowerSwitch(DigitalOutputDevice):
-    """Power switch controlled using :std_msgs:`SetBool` service."""
+    """Power switch controlled using :std_srvs:`SetBool` service."""
 
     def __init__(self, name, config, io_board):
         super(PowerSwitch, self).__init__(name, config, io_board)

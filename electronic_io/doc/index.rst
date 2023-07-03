@@ -39,7 +39,7 @@ Python API
    api
 
 Virtual Pins
--------
+------------
 
 .. toctree::
    :maxdepth: 2
