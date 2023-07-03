@@ -2,6 +2,11 @@
 Changelog for package electronic_io
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixed build and docs
+* Contributors: Martin Pecka
+
 1.0.2 (2023-06-30)
 ------------------
 
